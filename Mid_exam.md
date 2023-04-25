@@ -83,6 +83,21 @@ Date:2023.4.19
     - [平均绝对误差 MAE](#平均绝对误差-mae)
   - [优化（超多优化方法！）](#优化超多优化方法)
 - [卷积神经网络 CNN](#卷积神经网络-cnn)
+  - [感受野](#感受野)
+  - [池化层](#池化层)
+    - [空间金字塔池化](#空间金字塔池化)
+  - [现代卷积神经网络](#现代卷积神经网络)
+    - [VGG16](#vgg16)
+    - [ResNet](#resnet)
+    - [SqueezeNet](#squeezenet)
+    - [MobileNet](#mobilenet)
+    - [ShuffleNet](#shufflenet)
+  - [反卷积](#反卷积)
+  - [卷积神经网络的应用](#卷积神经网络的应用)
+    - [目标检测](#目标检测)
+    - [图像分割](#图像分割)
+    - [姿态估计](#姿态估计)
+    - [人脸识别](#人脸识别)
 - [生成对抗网络 GAN](#生成对抗网络-gan)
 
 
@@ -1137,4 +1152,78 @@ Tanh函数的优点是：
 Dropout的思想是：在训练过程中，随机的将一些神经元的输出置为0，这样可以使得模型的参数更加稳定。
 
 # 卷积神经网络 CNN
+卷积神经网络需要的参数有：
+* 卷积核filter/kernel：卷积核的大小和个数
+* 步长stride：卷积核在输入上滑动的步长
+* 填充padding：在输入的边缘填充0的个数
+
+在进行卷积操作时，每一个卷积核都要在input的一个channel上滑动一次，最后生成的许多个卷积后的图形相加才得到output的一层，也就是说，卷积有
+$filter\_shape=filter\_height*filter\_width*in\_channels*out\_channels$
+其中，in_channels是输入的通道数，out_channels是输出的通道数。
+
+## 感受野
+感受野的概念是指：输出的某一层的神经元对于输入的某一层的神经元的影响区域。感受野的计算公式为：
+**$receptive\_field = receptive\_field\_preview + (padding-1)*\prod_{i=1}^{k-1}stride\_size$**
+
+对于神经网络来说，感受野越大，那么它对于输入的信息的获取就越多，这样就可以使得模型的表达能力更强。所以引入了空洞卷积的概念。
+空洞卷积新增了一个卷积网络参数，即空洞率dilation，空洞卷积的取样区域是分离的，这样可以有效的增大感受野。
+
+## 池化层
+池化层的作用是：对输入的特征图进行降维，这样可以减少参数的数量，从而减少计算量，同时可以防止过拟合。
+朴素的池化算法包括：最大池化、平均池化、随机池化等。池化算法和卷积算法在原理上是类似的，都是在一个filter_size中选择合适的stride和padding，然后在输入上滑动，最后得到输出。
+
+### 空间金字塔池化
+空间金字塔池化的思想是：在不同的尺度下进行池化，然后将不同尺度下的池化结果进行拼接，这样可以使得模型对于不同尺度的信息都能够获取到。
+也就是说，空间金字塔池化可以获得很多个不同尺度的特征图，然后再将这些特征图分别进入全连接层，最后将这些全连接层的输出进行拼接，这样就可以得到最终的输出。
+
+## 现代卷积神经网络
+### VGG16
+VGG16的特点是：**使用小卷积核代替大卷积核**。它的好处是
+* 减少计算量：小卷积核的参数数量更少，对于获取相同大小的感受野来说，虽然小卷积核会导致更多的卷积层，但是总体的参数数量仍然更少。
+* 增加非线性：小卷积核的卷积层更多，这样可以使得模型的表达能力更强。
+* **BottleNeck：使用1*1的卷积核进行降维，降维之后的数据通过3*3的卷积核进行卷积，最后再通过1*1的卷积核进行升维，这样参数量会非常大程度的减小。**（在ResNet中，便运用到了BottleNeck的结构）
+
+VGG16的网络结构如下图所示：
+![VGG16](https://img-blog.csdnimg.cn/20200402154036896.png#pic_center)
+
+### ResNet
+ResNet的特点是：**使用残差结构**。深层神经网络往往会出现梯度消失的问题，残差结构使得反向传播的过程中出现了一条捷径，这样可以使得梯度的传播更加顺畅，有效缓解梯度消失的问题。
+ResNet网络一般由几层卷积层和激活函数可以构成一个残差块，多个残差块可以构成一个残差网络。残差块的结构如下图所示：
+![ResBlock](https://imgconvert.csdnimg.cn/aHR0cHM6Ly9tbWJpei5xcGljLmNuL21tYml6X3BuZy80bE4xWE9ac2hmY1RpYlc2YUE4UHo3dEJ6NDJZS2ljNFhkTHIweUs2MUZRS1FGaDczU3pzQVhIWUVQRWZ5cnBscGhVcTBHMTRZSUlFNmljWDJTbkFwcjV4US82NDA?x-oss-process=image/format,png)
+
+当然，残差块的设计还可以进一步的精进，比如**在残差块中加入BN层**。
+BN层的基本意思就是把每个通过的位置的数值正则化到均值为0，方差为1的分布上，这样可以使得模型的训练更加稳定。**正则化不会影响模型的表达能力**的原因是，起作用的不是数值的绝对数值，而是数值的相对大小，所以正则化之后，模型的表达能力不会发生改变。
+
+ResNet的网络结构如下图所示：
+![ResNet](https://githubraw.cdn.bcebos.com/PaddlePaddle/book/develop/03.image_classification/image/resnet.png?raw=true)
+
+### SqueezeNet
+SqueezeNet的特点是：**使用1\*1的卷积核代替3*3的卷积核**。
+SqueezeNet的网络结构如下图所示：
+![SqueezeNet](https://www.mdpi.com/sensors/sensors-19-00982/article_deploy/html/images/sensors-19-00982-g008.png)
+在倒数第二步中，通过1\*1的卷积核和3\*3的卷积核进行卷积，并将得到的两个64通道的卷积叠加到一起，获得了128通道的卷积并与input相加得到output。
+
+### MobileNet
+MobileNet的特点是：**使用深度可分离卷积**。
+深度可分离卷积包括两个步骤，首先是使用平凡的卷积核逐一对应输入channel进行卷积，最后使用1\*1的卷积核进行卷积合并。这样可以使得参数数量大大减少，从而减少计算量。
+MobileNet的网络结构如下图所示：
+![MobileNet](https://yinguobing.com/content/images/2018/03/mobilenet-v2-conv.jpg)
+
+### ShuffleNet
+ShuffleNet的特点是：**使用分组卷积**。
+和遗传算法有异曲同工之妙，ShuffleNet使用了分组卷积，在卷积之后进行了打乱操作，再将不同组的信息合并，这样可以使得不同组的信息进行交流，从而使得模型的表达能力更强。
+ShuffleNet的网络结构如下图所示：
+![ShuffleNet](https://img-blog.csdnimg.cn/20210519122037736.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3UwMTA0MTQ1ODk=,size_16,color_FFFFFF,t_70#pic_center)
+
+## 反卷积
+反卷积是在原特征图上补padding或空洞填充，然后再进行卷积，这样可以使得特征图的尺寸变大，从而使得模型的感受野变大。
+用图像来直观理解反卷积，如下图所示：
+![反卷积](https://img-blog.csdnimg.cn/20190426170115226.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3NpbmF0XzI4ODA3ODk5,size_16,color_FFFFFF,t_70)
+
+## 卷积神经网络的应用
+### 目标检测
+### 图像分割
+### 姿态估计
+### 人脸识别
+
 # 生成对抗网络 GAN
