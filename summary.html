@@ -1,0 +1,1073 @@
+<p>Author:UsanoCoCr
+    Date:2023.4.19
+    仅为北京大学人工智能基础复习使用</p>
+    <h1>目录</h1>
+    <ul>
+    <li><a href="#%E7%9B%AE%E5%BD%95">目录</a></li>
+    <li><a href="#%E5%85%A8%E5%B1%80%E6%90%9C%E7%B4%A2">全局搜索</a>
+    <ul>
+    <li><a href="#%E5%85%A8%E5%B1%80%E6%90%9C%E7%B4%A2%E6%A8%A1%E5%9E%8B%E7%9A%84%E6%8F%8F%E8%BF%B0">全局搜索模型的描述</a></li>
+    <li><a href="#%E5%9B%BE%E6%90%9C%E7%B4%A2%E4%B8%8E%E6%A0%91%E6%90%9C%E7%B4%A2">图搜索与树搜索</a></li>
+    <li><a href="#%E6%90%9C%E7%B4%A2%E7%AE%97%E6%B3%95%E7%9A%84%E8%AF%84%E4%BB%B7%E6%A0%87%E5%87%86">搜索算法的评价标准</a></li>
+    <li><a href="#%E6%97%A0%E4%BF%A1%E6%81%AF%E6%90%9C%E7%B4%A2">无信息搜索</a>
+    <ul>
+    <li><a href="#%E5%AE%BD%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2bfs">宽度优先搜索bfs</a></li>
+    <li><a href="#%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2dfs">深度优先搜索dfs</a>
+    <ul>
+    <li><a href="#%E6%B7%B1%E5%BA%A6%E5%8F%97%E9%99%90%E7%9A%84%E6%B7%B1%E5%BA%A6%E4%BC%98%E5%85%88%E6%90%9C%E7%B4%A2">深度受限的深度优先搜索</a></li>
+    </ul>
+    </li>
+    <li><a href="#%E5%8F%8C%E5%90%91%E6%90%9C%E7%B4%A2">双向搜索</a></li>
+    <li><a href="#%E4%B8%80%E8%87%B4%E4%BB%A3%E4%BB%B7%E6%90%9C%E7%B4%A2">一致代价搜索</a></li>
+    </ul>
+    </li>
+    <li><a href="#%E6%9C%89%E4%BF%A1%E6%81%AF%E6%90%9C%E7%B4%A2">有信息搜索</a>
+    <ul>
+    <li><a href="#%E8%B4%AA%E5%A9%AA%E6%9C%80%E4%BD%B3%E6%90%9C%E7%B4%A2">贪婪最佳搜索</a></li>
+    <li><a href="#a%E6%90%9C%E7%B4%A2">A*搜索</a></li>
+    <li><a href="#%E5%B8%B8%E8%A7%81%E7%9A%84%E5%90%AF%E5%8F%91%E5%BC%8F%E5%87%BD%E6%95%B0">常见的启发式函数</a></li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    <li><a href="#%E5%B1%80%E9%83%A8%E6%90%9C%E7%B4%A2">局部搜索</a>
+    <ul>
+    <li><a href="#%E7%88%AC%E5%B1%B1%E7%AE%97%E6%B3%95">爬山算法</a>
+    <ul>
+    <li><a href="#%E9%9A%8F%E6%9C%BA%E7%88%AC%E5%B1%B1%E6%B3%95">随机爬山法</a></li>
+    <li><a href="#%E7%AC%AC%E4%B8%80%E9%80%89%E6%8B%A9%E7%88%AC%E5%B1%B1%E6%B3%95">第一选择爬山法</a></li>
+    <li><a href="#%E9%9A%8F%E6%9C%BA%E9%87%8D%E5%90%AF%E7%88%AC%E5%B1%B1%E6%B3%95">随机重启爬山法</a></li>
+    </ul>
+    </li>
+    <li><a href="#%E6%A8%A1%E6%8B%9F%E9%80%80%E7%81%AB%E7%AE%97%E6%B3%95">模拟退火算法</a></li>
+    <li><a href="#%E5%B1%80%E9%83%A8%E6%9D%9F%E6%90%9C%E7%B4%A2">局部束搜索</a></li>
+    <li><a href="#%E9%81%97%E4%BC%A0%E7%AE%97%E6%B3%95">遗传算法</a></li>
+    <li><a href="#%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E6%B3%95">梯度下降法</a></li>
+    </ul>
+    </li>
+    <li><a href="#%E5%AF%B9%E6%8A%97%E6%90%9C%E7%B4%A2">对抗搜索</a>
+    <ul>
+    <li><a href="#%E6%9E%81%E5%A4%A7%E6%9E%81%E5%B0%8F%E5%80%BC%E6%90%9C%E7%B4%A2-minimax">极大极小值搜索 Minimax</a></li>
+    <li><a href="#alpha-beta%E5%89%AA%E6%9E%9D">Alpha-Beta剪枝</a></li>
+    <li><a href="#%E4%B8%8D%E5%AE%8C%E7%BE%8E%E7%9A%84%E5%AE%9E%E6%97%B6%E5%86%B3%E7%AD%96">不完美的实时决策</a></li>
+    <li><a href="#%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E6%A0%91%E6%90%9C%E7%B4%A2-mcts">蒙特卡洛树搜索 MCTS</a>
+    <ul>
+    <li><a href="#%E9%80%89%E6%8B%A9">选择</a></li>
+    <li><a href="#%E6%89%A9%E5%BC%A0">扩张</a></li>
+    <li><a href="#%E6%A8%A1%E6%8B%9F">模拟</a></li>
+    <li><a href="#%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD">反向传播</a></li>
+    <li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    <li><a href="#%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0">强化学习</a>
+    <ul>
+    <li><a href="#%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%9A%84%E7%8E%AF%E5%A2%83">强化学习的环境</a>
+    <ul>
+    <li><a href="#%E7%B4%AF%E7%A7%AF%E6%94%B6%E7%9B%8A">累积收益</a></li>
+    <li><a href="#%E7%8A%B6%E6%80%81%E4%BB%B7%E5%80%BC">状态价值</a></li>
+    <li><a href="#%E5%8A%A8%E4%BD%9C%E4%BB%B7%E5%80%BC">动作价值</a></li>
+    </ul>
+    </li>
+    <li><a href="#%E5%AF%BB%E6%89%BE%E6%9C%80%E4%BC%98%E7%AD%96%E7%95%A5%E7%9A%84%E6%96%B9%E6%B3%95">寻找最优策略的方法</a>
+    <ul>
+    <li><a href="#%E8%B4%AA%E5%BF%83%E7%AD%96%E7%95%A5">贪心策略</a></li>
+    <li><a href="#%CE%B5-%E8%B4%AA%E5%BF%83%E7%AD%96%E7%95%A5">ε-贪心策略</a></li>
+    <li><a href="#%E4%B9%90%E8%A7%82%E5%88%9D%E5%80%BC%E8%B4%AA%E5%BF%83">乐观初值贪心</a></li>
+    <li><a href="#ucb">UCB</a></li>
+    </ul>
+    </li>
+    <li><a href="#%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%9A%84%E7%AE%97%E6%B3%95">强化学习的算法</a>
+    <ul>
+    <li><a href="#%E8%B4%9D%E5%B0%94%E6%9B%BC%E6%96%B9%E7%A8%8B">贝尔曼方程</a></li>
+    <li><a href="#%E7%AD%96%E7%95%A5%E8%BF%AD%E4%BB%A3">策略迭代</a>
+    <ul>
+    <li><a href="#%E7%AD%96%E7%95%A5%E4%BC%B0%E5%80%BC">策略估值</a></li>
+    <li><a href="#%E7%AD%96%E7%95%A5%E6%8F%90%E5%8D%87">策略提升</a></li>
+    <li><a href="#%E7%AD%96%E7%95%A5%E8%BF%AD%E4%BB%A3-1">策略迭代</a></li>
+    </ul>
+    </li>
+    <li><a href="#%E5%80%BC%E8%BF%AD%E4%BB%A3">值迭代</a></li>
+    <li><a href="#%E5%B9%BF%E4%B9%89%E7%AD%96%E7%95%A5%E8%BF%AD%E4%BB%A3-gpi">广义策略迭代 GPI</a></li>
+    </ul>
+    </li>
+    <li><a href="#td%E5%AD%A6%E4%B9%A0">TD学习</a>
+    <ul>
+    <li><a href="#sarsa%E7%AE%97%E6%B3%95">SARSA算法</a></li>
+    <li><a href="#q-learning%E7%AE%97%E6%B3%95">Q-learning算法</a></li>
+    <li><a href="#%E7%AD%96%E7%95%A5%E6%A2%AF%E5%BA%A6%E5%AE%9A%E7%90%86">策略梯度定理</a></li>
+    <li><a href="#%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E7%AD%96%E7%95%A5%E6%A2%AF%E5%BA%A6%E7%AE%97%E6%B3%95">蒙特卡洛策略梯度算法</a></li>
+    <li><a href="#%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E7%AD%96%E7%95%A5%E6%A2%AF%E5%BA%A6%E7%AE%97%E6%B3%95-with-baseline">蒙特卡洛策略梯度算法 with baseline</a></li>
+    <li><a href="#actor-critic%E7%AE%97%E6%B3%95">Actor-Critic算法</a></li>
+    </ul>
+    </li>
+    </ul>
+    </li>
+    <li><a href="#%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0%E5%9F%BA%E7%A1%80">深度学习基础</a>
+    <ul>
+    <li><a href="#%E7%BA%BF%E6%80%A7%E5%9B%9E%E5%BD%92">线性回归</a>
+    <ul>
+    <li><a href="#lasso%E5%9B%9E%E5%BD%92">Lasso回归</a></li>
+    <li><a href="#ridge%E5%9B%9E%E5%BD%92">Ridge回归</a></li>
+    <li><a href="#%E6%9C%80%E5%A4%A7%E4%BC%BC%E7%84%B6%E4%BC%B0%E8%AE%A1">最大似然估计</a></li>
+    </ul>
+    </li>
+    <li><a href="#%E9%80%BB%E8%BE%91%E5%9B%9E%E5%BD%92">逻辑回归</a>
+    <ul>
+    <li><a href="#%E9%80%BB%E8%BE%91%E5%9B%9E%E5%BD%92%E7%9A%84%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0">逻辑回归的损失函数</a></li>
+    <li><a href="#%E4%BA%8C%E9%A1%B9%E9%80%BB%E8%BE%91%E5%9B%9E%E5%BD%92%E7%9A%84%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0">二项逻辑回归的激活函数</a></li>
+    <li><a href="#%E5%A4%9A%E9%A1%B9%E9%80%BB%E8%BE%91%E5%9B%9E%E5%BD%92%E7%9A%84%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0">多项逻辑回归的激活函数</a></li>
+    <li><a href="#%E8%A1%A5%E5%85%85%E5%8F%8D%E5%90%91%E4%BC%A0%E6%92%AD">补充：反向传播</a></li>
+    </ul>
+    </li>
+    <li><a href="#%E8%81%9A%E7%B1%BB%E9%97%AE%E9%A2%98">聚类问题</a>
+    <ul>
+    <li><a href="#k%E6%9C%80%E8%BF%91%E9%82%BB%E7%AE%97%E6%B3%95-knn">K最近邻算法 KNN</a></li>
+    <li><a href="#k%E5%9D%87%E5%80%BC%E7%AE%97%E6%B3%95-k-means">K均值算法 K-means</a></li>
+    </ul>
+    </li>
+    <li><a href="#%E6%BF%80%E6%B4%BB%E5%87%BD%E6%95%B0">激活函数</a>
+    <ul>
+    <li><a href="#relu%E5%87%BD%E6%95%B0">ReLU函数</a></li>
+    <li><a href="#leaky-relu%E5%87%BD%E6%95%B0">Leaky ReLU函数</a></li>
+    <li><a href="#tanh%E5%87%BD%E6%95%B0">Tanh函数</a></li>
+    </ul>
+    </li>
+    <li><a href="#%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0">损失函数</a>
+    <ul>
+    <li><a href="#%E5%9D%87%E6%96%B9%E8%AF%AF%E5%B7%AE-mse">均方误差 MSE</a></li>
+    <li><a href="#%E5%B9%B3%E5%9D%87%E7%BB%9D%E5%AF%B9%E8%AF%AF%E5%B7%AE-mae">平均绝对误差 MAE</a></li>
+    </ul>
+    </li>
+    <li><a href="#%E4%BC%98%E5%8C%96%E8%B6%85%E5%A4%9A%E4%BC%98%E5%8C%96%E6%96%B9%E6%B3%95">优化（超多优化方法！）</a></li>
+    </ul>
+    </li>
+    <li><a href="#%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C-cnn">卷积神经网络 CNN</a></li>
+    <li><a href="#%E7%94%9F%E6%88%90%E5%AF%B9%E6%8A%97%E7%BD%91%E7%BB%9C-gan">生成对抗网络 GAN</a></li>
+    </ul>
+    <h1>全局搜索</h1>
+    <h2>全局搜索模型的描述</h2>
+    <p>全局搜索可以用来解决一定的问题，描述一个问题模型一般有以下几个要素：
+    1.初始状态state0
+    2.可选择动作action_set
+    3.状态转移函数next_state=state0+action
+    4.目标状态state_goal
+    5.花费函数cost=cost(state,action)</p>
+    <h2>图搜索与树搜索</h2>
+    <p>一般情况下，搜索分为树搜索和图搜索两种，树搜索是指搜索的过程中不会出现环，图搜索是指搜索的过程中可能出现环，这两种搜索的区别在于<strong>图搜索需要记录已经搜索过的节点</strong>，以避免重复搜索，而树搜索不需要记录已经搜索过的节点，因为树搜索不会出现环，所以不需要记录已经搜索过的节点。</p>
+    <p>下面给出树搜索和图搜索的伪代码：
+    &lt;details&gt;
+    &lt;summary&gt;树搜索&lt;/summary&gt;</p>
+    <pre><code class="language-c++">void tree_search(state0,action_set,next_state,cost,state_goal)
+    {
+        if(state0==state_goal)//判断是否到达目标状态
+            return state0;
+        for(action in action_set)//遍历所有可选择的动作
+        {
+            next_state=state0+action;//计算下一个状态
+            tree_search(next_state,action_set,next_state,cost,state_goal);//递归搜索
+        }
+    }
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <p>&lt;details&gt;
+    &lt;summary&gt;图搜索&lt;/summary&gt;</p>
+    <pre><code class="language-c++">void graph_search(state0,action_set,next_state,cost,state_goal)
+    {
+        explored=empty;//初始化explored
+        if(state0==state_goal)//判断是否到达目标状态
+            return state0;
+        for(action in action_set)//遍历所有可选择的动作
+        {
+            next_state=state0+action;//计算下一个状态
+            if(next_state not in explored)//判断下一个状态是否已经搜索过
+            {
+                graph_search(next_state,action_set,next_state,cost,state_goal);//递归搜索
+                explored.add(next_state);//将下一个状态加入已搜索状态集合
+            }
+        }
+    }
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <p><em>上述树搜索/图搜索有可能陷入死循环，在这种情况下我们需要加入判定条件，当搜索的次数超过一定次数时，就停止搜索，这样就可以避免陷入死循环。</em></p>
+    <h2>搜索算法的评价标准</h2>
+    <p>搜索算法的评价标准一般有以下几个：
+    1.搜索的时间复杂度
+    2.搜索的空间复杂度
+    3.搜索的完备性：当解存在的时候，算法是否一定能够找到解？
+    4.搜索的最优性：当解存在的时候，算法是否一定能够找到最优解？</p>
+    <p><strong>在搜索问题中，时间复杂度经常用搜索树展开的节点数目表示
+    空间复杂度经常用同一时间需要储存的最大节点数目来估计</strong></p>
+    <h2>无信息搜索</h2>
+    <h3>宽度优先搜索bfs</h3>
+    <p>宽度优先搜索的时间复杂度为O($b^d$),空间复杂度为O($b^d$)
+    其中b为分支因子（一个节点有多少个子节点），d为搜索深度
+    在使用c++实现bfs时，一般会使用queue结构，闭节点集合一般使用set结构，这样可以避免重复搜索。</p>
+    <p>&lt;details&gt;
+    &lt;summary&gt;宽度优先搜索bfs&lt;/summary&gt;</p>
+    <pre><code class="language-c++">void bfs(state0,action_set,next_state,cost,state_goal)
+    {
+        queue=empty;//初始化queue
+        explored=empty;//初始化explored
+        queue.push(state0);//将初始状态加入queue
+        while(queue not empty)//当queue不为空时
+        {
+            state=queue.pop();//从queue中取出一个状态
+            if(state==state_goal)//判断是否到达目标状态
+                return state;
+            for(action in action_set)//遍历所有可选择的动作
+            {
+                next_state=state+action;//计算下一个状态
+                if(next_state not in explored)//判断下一个状态是否已经搜索过
+                {
+                    queue.push(next_state);//将下一个状态加入queue
+                    explored.add(next_state);//将下一个状态加入已搜索状态集合
+                }
+            }
+        }
+    }
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <h3>深度优先搜索dfs</h3>
+    <p>深度优先搜索的时间复杂度为O($b^m$),空间复杂度为O($bm$)
+    其中b为分支因子（一个节点有多少个子节点），m为搜索树的最大深度
+    在使用c++实现dfs时，一般会使用stack结构
+    深度优先搜索在内存受限的情况下可以搜的更深，所以<strong>在内存受限的情况下，深度优先搜索比宽度优先搜索更好</strong>。</p>
+    <p>&lt;details&gt;
+    &lt;summary&gt;深度优先搜索dfs&lt;/summary&gt;</p>
+    <pre><code class="language-c++">void dfs(state0,action_set,next_state,cost,state_goal)
+    {
+        stack=empty;//初始化stack
+        explored=empty;//初始化explored
+        stack.push(state0);//将初始状态加入stack
+        while(stack not empty)//当stack不为空时
+        {
+            state=stack.pop();//从stack中取出一个状态
+            if(state==state_goal)//判断是否到达目标状态
+                return state;
+            for(action in action_set)//遍历所有可选择的动作
+            {
+                next_state=state+action;//计算下一个状态
+                if(next_state not in explored)//判断下一个状态是否已经搜索过
+                {
+                    stack.push(next_state);//将下一个状态加入stack
+                    explored.add(next_state);//将下一个状态加入已搜索状态集合
+                }
+            }
+        }
+    }
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <h4>深度受限的深度优先搜索</h4>
+    <p>dfs因为没有存储过搜索过的点，所以可能会陷入死循环
+    深度受限的深度优先搜索的时间复杂度为O($b^l$),空间复杂度为O($bl$)
+    其中b为分支因子（一个节点有多少个子节点），l为限制层数</p>
+    <p>&lt;details&gt;
+    &lt;summary&gt;深度受限的深度优先搜索&lt;/summary&gt;</p>
+    <pre><code class="language-c++">void graph_search(state0,action_set,next_state,cost,state_goal,limit)
+    {
+        if(state0==state_goal)
+            return state0;
+        if(limit==0)//判断是否到达限制层数
+            return cutoff;
+        cutoff_occurred=false;//判断是否陷入死循环
+        for(action in action_set)
+        {
+            next_state=state0+action;
+            result=graph_search(next_state,action_set,next_state,cost,state_goal,limit-1);//递归搜索
+            if(result==cutoff)
+                cutoff_occurred=true;
+            else if(result!=failure)
+                return result;
+        }
+        if(cutoff_occurred)
+            return cutoff;
+        else//程序陷入死循环
+            return failure;
+    }
+    </code></pre>
+    <p>&lt;/details&gt;
+    深度受限搜索引出了迭代加深算法：在深度受限的深度优先搜索中，我们可以将限制层数从0开始逐渐增加，直到找到解为止。</p>
+    <h3>双向搜索</h3>
+    <p>双向搜索的时间复杂度为O($b^{d/2}$),空间复杂度为O($b^{d/2}$)</p>
+    <h3>一致代价搜索</h3>
+    <p>一致代价搜索在c++实现中使用了优先队列的结构，通过节点到起点的cost来排列，当终点从优先队列中输出时，即找到最优解</p>
+    <p>下面是一致代价搜索的伪代码：
+    &lt;details&gt;
+    &lt;summary&gt;一致代价搜索&lt;/summary&gt;</p>
+    <pre><code class="language-c++">void uniform_cost_search(state0,action_set,next_state,cost,state_goal)
+    {
+        priority_queue=empty;//初始化优先队列
+        explored=empty;//初始化explored
+        priority_queue.push(state0);//将初始状态加入优先队列
+        while(priority_queue not empty)//当优先队列不为空时
+        {
+            state=priority_queue.pop();//从优先队列中取出一个状态
+            if(state==state_goal)//判断是否到达目标状态
+                return state;
+            for(action in action_set)//遍历所有可选择的动作
+            {
+                next_state=state+action;//计算下一个状态
+                if(next_state not in explored)//判断下一个状态是否已经搜索过
+                {
+                    priority_queue.push(next_state);//将下一个状态加入优先队列
+                    explored.add(next_state);//将下一个状态加入已搜索状态集合
+                }
+            }
+        }
+    }
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <h2>有信息搜索</h2>
+    <p>有信息搜索在搜索时会使用启发式函数f
+    <strong>可采纳性：f不会高估到达目标的代价，即f(n)&lt;=c(n,n_goal)
+    一致性：对启发式函数，如果从状态n1到n2的代价为c，那么f(n1)&lt;=c+f(n2)</strong></p>
+    <h3>贪婪最佳搜索</h3>
+    <p>有信息搜索在搜索时会使用启发式函数h(n)，同样使用了优先队列的结构，通过节点到终点的启发式函数值来排列</p>
+    <h3>A*搜索</h3>
+    <p>A<em>搜索在c++实现中使用了优先队列的结构，通过节点到起点的cost加上节点到终点的启发式函数值来排列
+    即：f(n)=g(n)+h(n)
+    A</em>搜索的实际效果取决于启发式函数的好坏
+    <strong>如果启发式函数f(n)是可采纳的，那么A*搜索是最优的（即一定可以找到最优解）</strong></p>
+    <p><strong>估值函数是乐观的，A*就是最优的</strong></p>
+    <h3>常见的启发式函数</h3>
+    <ul>
+    <li>曼哈顿距离</li>
+    <li>欧拉距离</li>
+    <li>对角线距离</li>
+    <li>最大距离</li>
+    <li>最小距离</li>
+    </ul>
+    <p>启发式函数不必完全接近真实值，有时我们可以松弛启发性函数的值</p>
+    <h1>局部搜索</h1>
+    <h2>爬山算法</h2>
+    <p>爬山算法每次会从当前状态移动到相邻节点中最好的一个，算法会在山峰/山谷处停下，算法并不储存一棵搜索树，只存储当前节点和估值函数</p>
+    <p>下面给出爬山算法的伪代码：
+    &lt;details&gt;
+    &lt;summary&gt;爬山算法&lt;/summary&gt;</p>
+    <pre><code class="language-c++">void hill_climbing(state0,action_set,next_state,cost,state_goal)
+    {
+        state=state0;//初始化当前状态
+        while(true)//循环
+        {
+            next_state=best_next_state(state,action_set);//找到最好的邻居节点
+            if(next_state.value&lt;=state.value)//如果所有邻居节点的值都比当前节点的值小，说明已经到达山顶
+                return state;
+            state=next_state;//更新当前状态
+        }
+    }
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <p>爬山算法可能存在的问题：</p>
+    <ul>
+    <li>陷入局部最优：到达局部极值点就僵住不动了，可能达不到全局最优解</li>
+    </ul>
+    <p>解决方法：
+    1.随机平移：在局部最优点附近随机选择一个点，然后继续搜索
+    2.随机重启：在整个搜索空间中随机选择一个点，然后继续搜索
+    针对上述可能存在的问题，爬山法衍生出了很多变种</p>
+    <h3>随机爬山法</h3>
+    <p>随机爬山法在爬山算法的基础上，每次从当前状态的所有更优的邻居节点中随机选择一个节点作为下一个状态，随机爬山法收敛的更慢，但是往往可以找到更优的解</p>
+    <h3>第一选择爬山法</h3>
+    <p>第一选择爬山法每次随机找一个邻居，如果邻居估值更优，则直接跳到邻居，否则继续找下一个邻居，直到找到一个更优的邻居，或者所有邻居都不比当前状态更优
+    此方法<strong>不需要计算所有邻居节点的估值，在一个状态有特别多个邻居节点的时候，可以大大减少计算量</strong></p>
+    <h3>随机重启爬山法</h3>
+    <p>上述爬山法变种虽然可以提高爬山法的效率，但是也不具有完备性，有可能会陷在局部极值
+    随机重启爬山法保证了爬山过程中，如果找不到解，则从一个随机位置再次开始爬山，直到找到解为止</p>
+    <p>下面给出随机重启爬山法的伪代码：
+    &lt;details&gt;
+    &lt;summary&gt;随机重启爬山法&lt;/summary&gt;</p>
+    <pre><code class="language-c++">void hill_climbing(state0,action_set,next_state,cost,state_goal)
+    {
+        state=state0;//初始化当前状态
+        while(true)//循环
+        {
+            next_state=best_next_state(state,action_set);//找到最好的邻居节点
+            if(next_state.value&lt;=state.value)//如果所有邻居节点的值都比当前节点的值小，说明已经到达山顶
+                return state;
+            state=next_state;//更新当前状态
+        }
+    }
+    
+    void random_restart_hill_climbing(state0,action_set,next_state,cost,state_goal)
+    {
+        while(true)//循环
+        {
+            state=hill_climbing(state0,action_set,next_state,cost,state_goal);//调用爬山算法
+            if(state==state_goal)//判断是否到达目标状态
+                return state;
+            state0=random_state();//从随机位置开始爬山
+        }
+    }
+    //在使用随机重启爬山法时，可以设置一个最大迭代次数，如果超过最大迭代次数还没有找到解，则返回当前找到的最优解
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <h2>模拟退火算法</h2>
+    <p>模拟退火算法设置了一个概率函数p，用来决定是否接受一个更差的解，<strong>当前节点有概率p(t0)跳到一个比他更差的邻居节点。p的值随着迭代次数的增加而减小</strong>，模拟退火算法的伪代码如下：
+    &lt;details&gt;
+    &lt;summary&gt;模拟退火算法&lt;/summary&gt;</p>
+    <pre><code class="language-c++">void simulated_annealing(state0,action_set,next_state,cost,state_goal)
+    {
+        state=state0;//初始化当前状态
+        t0=100;//初始温度
+        while(true)//循环
+        {
+            next_state=random_next_state(state,action_set);//随机选择一个邻居节点
+            if(next_state.value&lt;=state.value)//邻居节点更差
+            {
+                if(p(t0)&gt;rand())//如果概率大于随机数，则接受更差的解
+                    state=next_state;
+            }
+            else//邻居节点更优
+                state=next_state;
+            t0=t0-1;//温度减小
+        }
+    }
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <h2>局部束搜索</h2>
+    <p>局部束搜索在同一时刻保留了k个状态，每个状态生成b个后继，如果k<em>b个后继中存在全局最优解，则直接返回，否则，从k</em>b个后继中选择k个最优的后继，作为下一时刻的k个状态，继续搜索</p>
+    <p>局部束搜索和随机重启爬山法的区别：</p>
+    <ul>
+    <li>随机重启爬山法每次搜索是独立的，而<strong>局部束搜索将k个后继节点作为一个整体，每次搜索在这k个后继节点中进行挑选</strong></li>
+    </ul>
+    <h2>遗传算法</h2>
+    <p>遗传算法模拟了生物有性生殖、变异、自然选择的过程，通过不断的迭代，最终得到一个最优解
+    在遗传算法中会使用到函数：
+    1.random_state()：随机生成一个状态
+    2.reproduce(state1,state2)：将两个状态交配
+    3.mutate(state)：对状态进行变异
+    4.evaluate(state)：评估状态的优劣</p>
+    <p>遗传算法的伪代码如下：
+    &lt;details&gt;
+    &lt;summary&gt;遗传算法&lt;/summary&gt;</p>
+    <pre><code class="language-c++">auto reproduce(state1,state2)
+    {
+        new_state=empty;
+        c=rand();//随机选择一个数
+        new_state.add(substring(state1,0,c));//将state1的前c个元素加入新状态
+        new_state.add(substring(state2,c+1,size-1));//将state2的后size()-c个元素加入新状态
+        return new_state;
+    }
+    
+    void genetic_algorithm(state0,action_set,next_state,cost,state_goal)
+    {
+        population_size=100;//种群大小
+        population=init_population(population_size);//初始化种群
+        while(true)//循环
+        {
+            new_population=empty;
+            for(i=0;i&lt;population_size;i++)
+            {
+                x=random_state();//随机选择一个状态
+                y=random_state();//随机选择一个状态
+                z=reproduce(x,y);//交配
+                if (rand()&lt;0.1)//有10%的概率进行变异
+                    z=mutate(z);
+                new_population.add(z);//将新生成的状态加入种群
+            }
+            population=new_population;//更新种群
+        }
+        best_state=best_state(population);//找到最优解
+    }
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <h2>梯度下降法</h2>
+    <p>梯度下降法在实现上和爬山法非常相似，梯度下降即连续集里的爬山算法</p>
+    <h1>对抗搜索</h1>
+    <p>ai基础课所讲的对抗搜索主要运用在双人零和完全信息游戏中，在这一类游戏中，我们可以通过搜索来描述游戏模型：</p>
+    <ul>
+    <li>初始状态：游戏开始时的状态</li>
+    <li>Players：轮到哪个玩家进行操作</li>
+    <li>Actions：每个玩家可以进行的操作</li>
+    <li>状态转移模型：每个玩家进行操作后，游戏的状态如何转移</li>
+    <li>终止条件：游戏何时结束</li>
+    <li>效用函数：评估游戏结束后两位玩家的得分</li>
+    </ul>
+    <h2>极大极小值搜索 Minimax</h2>
+    <p>Minimax算法中双方作为理性决策者，都会选择让自己收益最大的节点
+    Minimax算法的时间复杂度是O(b^m)，空间复杂度是O(bm)，
+    其中b为每个节点的分支数，m为搜索深度</p>
+    <p>Minimax算法的伪代码如下：
+    &lt;details&gt;
+    &lt;summary&gt;Minimax算法&lt;/summary&gt;</p>
+    <pre><code class="language-c++">auto minimax(state,player)
+    {
+        if(state is terminal)//判断是否为终止状态
+            return utility(state);//返回效用值
+        if(player==MAX)//如果是MAX玩家
+        {
+            v=-inf;//v为最大值
+            for each action in actions(state)//遍历所有的操作
+            {
+                v=max(v,minimax(result(state,action),MIN));//更新v
+            }
+            return v;
+        }
+        else//如果是MIN玩家
+        {
+            v=inf;//v为最小值
+            for each action in actions(state)//遍历所有的操作
+            {
+                v=min(v,minimax(result(state,action),MAX));//更新v
+            }
+            return v;
+        }
+    }
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <h2>Alpha-Beta剪枝</h2>
+    <p>Alpha-Beta剪枝是对Minimax算法的优化，它可以减少搜索的节点数，从而减少搜索的时间
+    Alpha-Beta剪枝剪去的节点一般拥有这样的特点：</p>
+    <ul>
+    <li>当该节点为最大节点时，节点上方的路径要取最小值，下方的路径要取最大值，当节点的子节点传上来一个value=v，且v大于节点的兄弟节点的value=β时，我们就不用展开这个节点了，因为节点上方的取最小值路径一定会选择兄弟节点的路径</li>
+    <li>当该节点为最小节点时，节点上方的路径要取最大值，下方的路径要取最小值，当节点的子节点传上来一个value=v，且v小于节点的兄弟节点的value=α时，我们就不用展开这个节点了，因为节点上方取最大值的路径一定会选择兄弟节点的路径</li>
+    </ul>
+    <p>Alpha-Beta剪枝算法的伪代码如下：
+    &lt;details&gt;
+    &lt;summary&gt;Alpha-Beta剪枝算法&lt;/summary&gt;</p>
+    <pre><code class="language-c++">auto alphabeta(state,player,alpha,beta)
+    {
+        if(state is terminal)//判断是否为终止状态
+            return utility(state);//返回效用值
+    
+        //注意：这里的最大值最小值节点是三层中的最上层
+        function max_value(state,alpha,beta)
+        {
+            v=-inf;//v为最大值
+            for each action in actions(state)//遍历所有的操作
+            {
+                v=max(v,min_value(result(child_state,action),alpha,beta));//更新v
+                if(v&gt;=beta)//如果v大于beta
+                    return v;//返回v
+                alpha=max(alpha,v);//更新alpha
+            }
+            return v;
+        }
+    
+        function min_value(state,alpha,beta)
+        {
+            v=inf;//v为最小值
+            for each action in actions(state)//遍历所有的操作
+            {
+                v=min(v,max_value(result(child_state,action),alpha,beta));//更新v
+                if(v&lt;=alpha)//如果v小于alpha
+                    return v;//返回v
+                beta=min(beta,v);//更新beta
+            }
+            return v;
+        }
+    }
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <h2>不完美的实时决策</h2>
+    <p>不完美的实时决策是指在决策过程中，我们并不知道游戏的终止条件，因此我们需要<strong>在决策过程中不断的评估当前的状态，使用启发式函数来辅助搜索</strong>
+    当到了一定的时间/深度，则停止搜索，返回当前的最优解，这种方法是一种蒙特卡洛树搜索的近似方法</p>
+    <h2>蒙特卡洛树搜索 MCTS</h2>
+    <p>蒙特卡洛搜索是在一定的预设条件（时间、内存、迭代次数）下不断地迭代进行更新，并利用统计学原理找到近似最优解的一种方法
+    <strong>蒙特卡洛的每次迭代包括四个步骤：选择、扩张、模拟、反向传播</strong></p>
+    <h3>选择</h3>
+    <p>选择是指从根节点开始，不断地选择下一个节点，直到遇到一个未被访问的节点，或者遇到一个终止节点
+    选择部分的代码是：
+    &lt;details&gt;
+    &lt;summary&gt;选择&lt;/summary&gt;</p>
+    <pre><code class="language-c++">function select(node)
+    {
+        while(node is not terminal)//如果节点不是终止节点
+        {
+            if(node is fully expanded)//如果节点已经被扩张
+            {
+                node=best_child(node,ucb1) //选择最优子节点
+                return node
+            }
+            else//如果节点未被扩张
+            {
+                expand(node)//扩张节点
+            }
+        }
+    }
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <h3>扩张</h3>
+    <p>扩张是指从当前节点中选择未被访问的子节点，将其加入到当前节点的子节点中
+    扩张部分的代码是：
+    &lt;details&gt;
+    &lt;summary&gt;扩张&lt;/summary&gt;</p>
+    <pre><code class="language-c++">function expand(node)
+    {
+        if(node is not fully expanded)//如果节点未被扩张
+        {
+            action=untried_actions(node)//获取未被访问的子节点
+            child_node=child_node(node,action)//获取子节点
+            add_child(node,child_node)//将子节点加入到当前节点的子节点中
+        }
+    }
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <h3>模拟</h3>
+    <p>模拟是指从当前节点开始，不断地随机选择一个子节点，直到遇到一个终止节点，然后返回该终止节点的效用值
+    有时我们可以选择随机模拟直到终局来获得效用值，也可以通过启发式函数来获得效用值
+    在评估上，人们人造了一个函数来反映节点的好坏：
+    <em><em>$UCB = Vi + C</em>\sqrt{(ln(n)/N_i)}$</em>*</p>
+    <h3>反向传播</h3>
+    <p>反向传播是指从当前节点开始，不断地更新父节点的效用值，直到遇到根节点
+    反向传播部分的代码是：
+    &lt;details&gt;
+    &lt;summary&gt;反向传播&lt;/summary&gt;</p>
+    <pre><code class="language-c++">function backpropagate(node,value)
+    {
+        while(node is not root)//如果节点不是根节点
+        {
+            node.visits++//节点的访问次数加一
+            node.value+=value//节点的效用值加上value
+            node=node.parent//节点指向父节点
+        }
+        //其中，value = UCB(node)
+    }
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <h3>总结</h3>
+    <p>此时，我们可以写出蒙特卡洛搜索的完整版伪代码：
+    &lt;details&gt;
+    &lt;summary&gt;蒙特卡洛搜索&lt;/summary&gt;</p>
+    <pre><code class="language-c++">function monte_carlo_tree_search(state)
+    {
+        root=initialise(state)//初始化根节点
+        while(时间未到)//如果时间未到
+        {
+            node=select(root)//选择节点
+            value=simulate(node)//模拟节点
+            backpropagate(node,value)//反向传播
+        }
+        return best_child(root,ucb1)//返回最优子节点
+    }
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <h1>强化学习</h1>
+    <p>强化学习在游戏中也有很广泛的应用，我们可以构建问题模型：</p>
+    <ul>
+    <li>初始状态S0</li>
+    <li>当前玩家C</li>
+    <li>动作A</li>
+    <li>状态转移函数P</li>
+    <li>终止状态ST</li>
+    <li>奖励函数R</li>
+    </ul>
+    <p><strong>注意：状态转移和奖励都不一定是确定性的，可以是一个概率分布</strong>
+    在强化学习中，我们要寻找一个最优策略π，使得从初始状态S0开始，不断地执行策略π，最终达到终止状态ST，期间的奖励函数R最大化</p>
+    <h2>强化学习的环境</h2>
+    <h3>累积收益</h3>
+    <p>在计算强化学习某一路径的总价值时，我们会使用累积收益G
+    G的计算公式是：
+    *<em>$G_t = R_{t+1} + γ*R_{t+2} + ... + γ^{T-t+1}<em>R_T$</em></em>
+    其中，$γ$是折扣因子，$γ$越大，表示对未来的奖励越看重，$γ$越小，表示对未来的奖励越不看重</p>
+    <h3>状态价值</h3>
+    <p>状态价值是指在某一状态s下，执行某一策略π，从该状态开始，不断地执行策略π，最终达到终止状态ST，期间的奖励函数R的期望值
+    状态价值的计算公式是：
+    *<em>$V_{π}(s) = E_{π}[G_t|S_t=s]$ = $E_{π}[R_{t+1} + γ*R_{t+2} + ... + γ^{T-t+1}<em>R_T|S_t=s]$</em></em></p>
+    <h3>动作价值</h3>
+    <p>动作价值是指在某一状态s下，执行某一策略π，从该状态开始，执行某一动作a，不断地执行策略π，最终达到终止状态ST，期间的奖励函数R的期望值
+    动作价值的计算公式是：
+    *<em>$Q_{π}(s,a) = E_{π}[G_t|S_t=s,A_t=a]$ = $E_{π}[R_{t+1} + γ*R_{t+2} + ... + γ^{T-t+1}<em>R_T|S_t=s,A_t=a]$</em></em></p>
+    <p>状态价值和动作价值可以通过数学的方式建立联系：
+    *<em>$V_{π}(s) = Σ_a π(a|s)<em>Q_{π}(s,a)$</em></em>
+    同理，有：
+    <strong>$Q_{π}(s,a) = Σ_{s'} Σ_r p(s',r|s,a)<em>(r + γ</em>V_{π}(s'))$</strong>
+    <strong>上述式子即为贝尔曼方程，它的意思是：在状态s下，执行动作a，得到状态s'和奖励r，那么在状态s下，执行动作a的价值就是 奖励r + 折扣因子*状态s'产生的价值依概率的期望值</strong></p>
+    <h2>寻找最优策略的方法</h2>
+    <h3>贪心策略</h3>
+    <p>贪心策略是指在每一步都选择当前状态下价值最大的动作，即：
+    <strong>$a = argmax_a Q_{π}(s,a)$</strong></p>
+    <h3>ε-贪心策略</h3>
+    <p>ε-贪心策略是指在每一步都有一定的概率选择随机动作，即：
+    <strong>$a = argmax_a Q_{π}(s,a)$ with probability 1-ε</strong>
+    <strong>$a = random$ with probability ε</strong></p>
+    <h3>乐观初值贪心</h3>
+    <p>乐观初值贪心将所有节点动作价值的初始值设的很大，这样可以使得在初始阶段，鼓励没有被访问到的节点被访问，从而使得更多节点的价值有机会被更新，从而使得最终的策略更加优秀</p>
+    <h3>UCB</h3>
+    <p>估值大的节点，我们应该去访问；访问次数少的节点，我们应该去访问
+    将当前的估值和访问次数结合起来，得到UCB值，UCB值越大，表示该节点的价值越大，越有可能是最优节点
+    UCB公式是：
+    <em><em>$UCB = Q_{π}(s,a) + c</em>\sqrt{(ln(N)/n)}$</em>*</p>
+    <h2>强化学习的算法</h2>
+    <h3>贝尔曼方程</h3>
+    <p>贝尔曼方程分为贝尔曼期望方程和贝尔曼最优方程
+    贝尔曼期望方程是指：
+    <strong>$Q_{π}(s,a) = Σ_{s'} Σ_r p(s',r|s,a)<em>(r + γ</em>V_{π}(s'))$</strong>
+    这个式子在介绍动作价值和状态价值的关联性时已经介绍过，下面将介绍贝尔曼最优方程：
+    <strong>$Q_{π}(s,a) = Σ_{s'} Σ_r p(s',r|s,a)<em>(r + γ</em>max_{a'}Q_{π}(s',a'))$</strong></p>
+    <p>在强化学习中，<strong>贝尔曼期望方程对应着策略迭代，贝尔曼最优方程对应着值迭代</strong></p>
+    <h3>策略迭代</h3>
+    <p>策略迭代算法一共分为三个步骤：</p>
+    <ul>
+    <li>策略估值</li>
+    <li>策略提升</li>
+    <li>策略迭代</li>
+    </ul>
+    <h4>策略估值</h4>
+    <p>策略估值的目的是根据当前的策略，利用贝尔曼期望方程，计算出每个状态的值函数$v_π$，即：
+    <strong>$v_π(s) = Σ_aπ(a|s) Σ_{s'} Σ_r p(s',r|s,a)<em>(r + γ</em>v_π(s'))$</strong>
+    同时拥有迭代更新规则：
+    <strong>$v_π(s) = Σ_aπ(a|s) Σ_{s'} Σ_r p(s',r|s,a)<em>(r + γ</em>v_k(s'))$</strong>
+    其中，$v_π(s)$对应的是策略π下准确稳定的状态值函数，$v_k(s)$对应的是策略π下第k次迭代的状态值函数
+    策略估值在计算状态值函数时，是利用当前策略π，计算出下一次迭代的状态值函数$v_{k+1}$，然后再利用$v_{k+1}$计算出$v_{k+2}$，以此类推，直到$v_{k+1}$和$v_k$的差值小于某个阈值，即$v_{k+1} - v_k &lt; \theta$，则停止迭代，得到$v_π$，即为策略π下准确稳定的状态值函数
+    下面是策略估值的伪代码：
+    &lt;details&gt;
+    &lt;summary&gt;策略估值&lt;/summary&gt;</p>
+    <pre><code class="language-c++">function policy_evaluation(π,θ)
+        V = 0
+        while True
+            delta = 0
+            for s in S
+                v = V[s]
+                V[s] = Σ_aπ(a|s) Σ_{s'} Σ_r p(s',r|s,a)*(r + γ*V[s'])
+                delta = max(delta, abs(v - V[s]))
+            if delta &lt; θ
+                break
+        return V
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <h4>策略提升</h4>
+    <p>策略提升的目的是根据当前的状态值函数$v_π$，计算出每个状态下的最优动作价值函数$q_π$，即：
+    <strong>$q_π(s,a) = Σ_{s'} Σ_r p(s',r|s,a)<em>(r + γ</em>v_π(s'))$</strong>
+    之后，我们可以通过贪心选择动作产生新的策略，即：
+    <strong>$π'(s) = argmax_a q_π(s,a)$</strong></p>
+    <h4>策略迭代</h4>
+    <p>策略迭代的目的是不断迭代策略估值和策略提升，直到策略不再发生变化，策略迭代其实就相当于是策略估值和策略提升的结合，它的伪代码如下：
+    &lt;details&gt;
+    &lt;summary&gt;策略迭代&lt;/summary&gt;</p>
+    <pre><code class="language-c++">function policy_iteration(θ)
+        1. initialize π arbitrarily
+    
+        2. policy evaluation
+        while True
+            delta = 0
+            for s in S
+                v = V[s]
+                V[s] = Σ_aπ(a|s) Σ_{s'} Σ_r p(s',r|s,a)*(r + γ*V[s'])
+                delta = max(delta, abs(v - V[s]))
+            if delta &lt; θ
+                break
+        
+        3. policy improvement
+        while True
+            policy_stable = True
+            for s in S
+                old_action = π(s)
+                π(s) = argmax_a Σ_{s'} Σ_r p(s',r|s,a)*(r + γ*V[s'])
+                if π(s) != old_action
+                    policy_stable = False
+            if policy_stable
+                break
+        return π
+    </code></pre>
+    <p>&lt;/details&gt;
+    策略迭代的终止条件是策略不再发生变化，也就是贝尔曼最优方程中的最优动作价值函数$q_π(s,a)$不再发生变化。策略迭代的伪代码中，策略估值和策略提升是交替进行的。</p>
+    <h3>值迭代</h3>
+    <p>值迭代算法利用的是贝尔曼最优方程，它的伪代码如下：
+    &lt;details&gt;
+    &lt;summary&gt;值迭代&lt;/summary&gt;</p>
+    <pre><code class="language-c++">function value_iteration(θ)
+        V = 0
+        while True
+            delta = 0
+            for s in S
+                v = V[s]
+                V[s] = max_a Σ_{s'} Σ_r p(s',r|s,a)*(r + γ*V[s'])
+                delta = max(delta, abs(v - V[s]))
+            if delta &lt; θ
+                break
+        return V
+    </code></pre>
+    <p>&lt;/details&gt;
+    值迭代更新后的V[s]，是当前状态下所有动作的最优动作价值函数的最大值。</p>
+    <h3>广义策略迭代 GPI</h3>
+    <p>策略迭代和值迭代可以用来选择动作产生新策略，这起到了一种拮抗的作用，在GPI中，我们可以同时使用策略迭代和值迭代得到稳定的解决方案，同时引入协同学习的思想，使得策略迭代和值迭代的效果更好。</p>
+    <h2>TD学习</h2>
+    <p>TD学习和蒙特卡洛算法在实际操作层面上有一些差异：</p>
+    <ul>
+    <li>TD在有或者没有结果的情况下均可以学习(如不必等一盘象棋结束)；MC则必须等待结束得到结果。TD胜！</li>
+    <li>TD在更新状态价值时使用的是TD 目标值，即基于即时奖励和下一状态的预估价值来替代当前状态在状态序列结束时可能得到的收获，是当前状态价值的有偏估计；而MC则使用实际的收获来更新状态价值，是某一策略下状态价值的无偏估计，MC胜！</li>
+    <li>虽然TD得到的价值是有偏估计，但是其方差却比MC得到的方差要低，且对初始值敏感，通常比MC法更加高效。TD胜！</li>
+    </ul>
+    <p>TD学习的伪代码如下：
+    &lt;details&gt;
+    &lt;summary&gt;TD学习&lt;/summary&gt;</p>
+    <pre><code class="language-c++">function TD(θ)
+        V = 0
+        while True
+            delta = 0
+            for s in S
+                v = V[s]
+                V[s] = V[s] + α*(r + γ*V[s'] - V[s])
+                delta = max(delta, abs(v - V[s]))
+            if delta &lt; θ
+                break
+        return V
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <p><strong>在强化学习的应用中，有两种时序差分算法，分别是SARSA算法和Q-learning算法，它们都可以被运用到实践中。</strong></p>
+    <h3>SARSA算法</h3>
+    <ul>
+    <li>SARSA算法是一种基于值的强化学习算法，它的全称是State-Action-Reward-State-Action，即状态-动作-奖励-状态-动作。</li>
+    <li>SARSA算法的核心思想是：在每一步更新Q值时，都<strong>使用ε-贪心最优的动作来更新Q值</strong>，即$Q(s,a)←Q(s,a)+α(r+γQ(s',a')-Q(s,a))$</li>
+    </ul>
+    <p>SARSA算法的伪代码如下：
+    &lt;details&gt;
+    &lt;summary&gt;SARSA算法&lt;/summary&gt;</p>
+    <pre><code>Initialize Q(s,a),∀s∈S,a∈A(s),Q(terminal-state,·)=0
+    Repeat (for each episode):
+        Initialize s
+        Choose a from s using policy derived from Q (e.g., ε-greedy)
+        Repeat (for each step of episode):
+            Take action a, observe r, s'
+            Choose a' from s' using policy derived from Q (e.g., ε-greedy)
+            Q(s,a)←Q(s,a)+α(r+γQ(s',a')-Q(s,a))
+            s←s'; a←a';
+        until s is terminal
+    </code></pre>
+    <p>&lt;/details&gt;
+    SARSA通过策略给定最优的第二步来估计当前最优的第一步，如果第二步的效果很好，那么Q值就会被更新为更大的值，反之则会被更新为更小的值。</p>
+    <h3>Q-learning算法</h3>
+    <ul>
+    <li>Q-learning算法是一种基于值的强化学习算法，它的全称是Quality-Learning，即质量学习。</li>
+    <li>Q-learning算法的核心思想是：在每一步更新Q值时，都<strong>使用下一状态下的最大动作来更新Q值</strong>，即:$Q(s,a)←Q(s,a)+α(r+γ*argmax_aQ(s',a)-Q(s,a))$</li>
+    </ul>
+    <p>Q-learning算法的伪代码如下：
+    &lt;details&gt;
+    &lt;summary&gt;Q-learning算法&lt;/summary&gt;</p>
+    <pre><code>Initialize Q(s,a),∀s∈S,a∈A(s),Q(terminal-state,·)=0
+    Repeat (for each episode):
+        Initialize s
+        Repeat (for each step of episode):
+            Choose a from s using policy derived from Q (e.g., ε-greedy)
+            Take action a, observe r, s'
+            Q(s,a)←Q(s,a)+α(r+γ*argmax_aQ(s',a)-Q(s,a))
+            s←s'
+        until s is terminal
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <p><strong>Q-learning通过策略给定最优（不进行贪心了！）的第二步来估计当前最优的第一步</strong>，如果第二步的效果很好，那么Q值就会被更新为更大的值，反之则会被更新为更小的值</p>
+    <h3>策略梯度定理</h3>
+    <p>对于片段性问题，定义策略π的性能为$J(θ)=v_{πθ}(S_0)$
+    在这里，θ是策略π的参数，v是状态价值函数，$S_0$是初始状态。θ的参数往往通过神经网络进行设定。
+    则策略梯度定理告诉我们，策略π的梯度为：
+    $∇_θJ(θ)=E_π[∑_a∇_θπ(a_t|s_t)Q_π(s_t,a_t)]$
+    其中，$Q_π(s_t,a_t)$是在状态$s_t$下采取动作$a_t$的价值，$∇_θπ(a_t|s_t)$是在状态$s_t$下采取动作$a_t$的概率的梯度。</p>
+    <h3>蒙特卡洛策略梯度算法</h3>
+    <p>将策略梯度定理中的公式转化为基于采样的、期望相等的近似公式
+    则状态$S_t$的价值变化率为：$\frac{G_t}{π(a_t|s_t,θ)}*∇_θπ(a_t|s_t,θ)$
+    其中G是历史回报，π是策略，θ是策略的参数，$a_t$是在状态$S_t$下采取的动作。
+    状态$S_t$的价值变化率乘以衰减率γ，则可以生成一个序列，得到$S_0$的价值变化率：
+    $∇J(θ)=E_π[∑_tγ^t\frac{G_t}{π(a_t|s_t,θ)}*∇_θπ(a_t|s_t,θ)]$
+    则可以得到蒙特卡洛策略梯度算法的伪代码：
+    &lt;details&gt;
+    &lt;summary&gt;蒙特卡洛策略梯度算法&lt;/summary&gt;</p>
+    <pre><code>Initialize θ
+    Repeat (for each episode):
+        Generate an episode S_0,A_0,R_1,...,S_T-1,A_T-1,R_T following π(·|·,θ)
+        For each step of episode t=0,1,...,T-1:
+            G←∑_(k=t+1)^T*γ^(k-t-1)*R_k
+            θ←θ+αγ^tG∇_θlnπ(A_t|S_t,θ)
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <h3>蒙特卡洛策略梯度算法 with baseline</h3>
+    <p>在蒙特卡洛策略梯度算法中，我们可以<strong>引入一个baseline，即$b(S_t)$，来减少方差，使得算法更加稳定</strong>。
+    在策略梯度定理中减去baseline之后，原定理变为：
+    $∇_θJ(θ)=E_π[∑_a∇_θπ(a_t|s_t)(Q_π(s_t,a_t)-b(s_t))]$
+    一般令$b(S_t)=v(S_t,w)$，其中<strong>另一个神经网络W的参数为w</strong>，v是状态价值函数，$S_t$是状态。
+    则蒙特卡洛策略梯度算法 with baseline的伪代码如下：
+    &lt;details&gt;
+    &lt;summary&gt;蒙特卡洛策略梯度算法*&lt;/summary&gt;</p>
+    <pre><code>Initialize θ,w
+    Repeat (for each episode):
+        Generate an episode S_0,A_0,R_1,...,S_T-1,A_T-1,R_T following π(·|·,θ)
+        For each step of episode t=0,1,...,T-1:
+            G←∑_(k=t+1)^T*γ^(k-t-1)*R_k
+            δ←G-v(S_t,w)
+            θ←θ+αγ^t*δ*∇_θlnπ(A_t|S_t,θ)
+            w←w+αγ^t*δ*∇_wv(S_t,w)
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <h3>Actor-Critic算法</h3>
+    <p>将蒙特卡洛策略梯度算法 with baseline中的蒙特卡洛算法替换为时序差分算法，即将全部return替换为单步return，可以获得单步Actor-Critic算法。
+    其中：</p>
+    <ul>
+    <li>Actor是按照策略梯度算法的策略$π(A_t|S_t,θ)$决定下一步的行动</li>
+    <li>Critic是利用状态价值函数$v(S_t,w)$来评价策略的好坏</li>
+    </ul>
+    <p>Actor-Critic算法的伪代码如下：
+    &lt;details&gt;
+    &lt;summary&gt;Actor-Critic算法&lt;/summary&gt;</p>
+    <pre><code>Initialize θ,w,I=1
+    Repeat (for each episode):
+        Generate an episode S_0,A_0,R_1,...,S_T-1,A_T-1,R_T following π(·|·,θ)
+        while S_t is not terminal:
+            δ←R_t+γ*v(S_t+1,w)-v(S_t,w)
+            θ←θ+α^I*δ*∇_θlnπ(A_t|S_t,θ)
+            w←w+β*δ*∇_wv(S_t,w)
+            I←γ*I
+            S_t←S_t+1
+    </code></pre>
+    <p>&lt;/details&gt;
+    Actor-Critic相比于蒙特卡洛平均梯度算法with baseline的改进是，w网络不仅仅用于计算baseline，还用于计算下一步的状态价值函数,分化出了一个完整的Critic网络。</p>
+    <h1>深度学习基础</h1>
+    <h2>线性回归</h2>
+    <p>线性回归在解决回归问题时，利用最小二乘法，可以求解出最优的参数，使得预测值与真实值的差值最小，大概可以理解为函数：
+    <strong>$y = w_1x_1 + w_2x_2 + ... + w_nx_n + b$</strong>
+    其中，$w_1,w_2,...,w_n$是参数，$b$是偏置，$x_1,x_2,...,x_n$是特征，$y$是预测值
+    <strong>偏置的意义是，可以使输出值上下浮动，以更好地适应输入值</strong>
+    但是，<strong>当样本量很少时，最小二乘解所需的$A^TA$的逆矩阵可能不存在，这时候就需要用到梯度下降法</strong>，梯度下降法的伪代码如下:
+    &lt;details&gt;
+    &lt;summary&gt;梯度下降法&lt;/summary&gt;</p>
+    <pre><code class="language-c++">function gradient_descent(θ)
+        initialize w arbitrarily
+        η = learning rate
+        while True
+            w = w - η*∇wL(w)
+            if ∇wL(w) &lt; θ
+                break
+        return w
+    </code></pre>
+    <p>&lt;/details&gt;
+    但是在梯度下降之后，我们获得的参数往往会拥有较高的自由度，得到的曲线可能不够平滑，这时候就需要用到正则化，<strong>正则化的目的是为了防止过拟合</strong>，正则化的方法有很多，比如L1正则化和L2正则化，反别对应着Lasso回归和Ridge回归。</p>
+    <h3>Lasso回归</h3>
+    <p>Lasso回归的目的是为了防止过拟合，它指的是：<strong>$λΣ_{i=1}^n|w_i|$</strong>
+    经过Lasso回归处理后的数据，会使<strong>更多的参数变为0</strong>。</p>
+    <h3>Ridge回归</h3>
+    <p>Ridge回归的目的是为了防止过拟合，它指的是：<strong>$λΣ_{i=1}^n(w_i)^2$</strong>
+    经过Ridge回归处理后的数据，会使<strong>参数的值变小</strong>。</p>
+    <h3>最大似然估计</h3>
+    <p>利用已知的样本结果信息，反推最具有可能导致这些样本出现的参数值，这就是最大似然估计。</p>
+    <h2>逻辑回归</h2>
+    <p>逻辑回归是用于分类问题的，它的目的是为了将数据分为两类，比如说，我们可以将数据分为正样本和负样本。</p>
+    <h3>逻辑回归的损失函数</h3>
+    <p>熵(Entropy)是无损编码事件信息中的最小平均编码长度，代表惊异程度，也就是说，熵越大，惊异程度越大，也就是说，熵越大，不确定性越大。熵的计算公式为：
+    <strong>$H(X) = -Σ_{i=1}^n p_i*log(p_i)$</strong>
+    在逻辑回归中，我们使用的是交叉熵损失函数(Cross Entropy)，用于度量两个概率分布间的差异性信息，它的计算公式为：
+    <strong>$H(p,q) = -Σ_{i=1}^n p_i*log(q_i)$</strong>
+    更一般的情况下，我们可以使用KL散度(Kullback-Leibler Divergence)来计算两个概率分布之间的差异性信息，它的计算公式为：
+    <strong>$D_{KL}(p||q) = Σ_{i=1}^n p_i*log(\frac{p_i}{q_i})$</strong></p>
+    <p>则PQ的KL散度=PQ的交叉熵-P的熵
+    当KL散度=0时，PQ的交叉熵=P的熵，也就是说，当两个概率分布完全一致时，KL散度为0。
+    对于线性模型，样本数据的分布P已经确定，即P=1，所以KL散度=PQ的交叉熵=$-Σ_{i}logq_i$</p>
+    <h3>二项逻辑回归的激活函数</h3>
+    <p>二项逻辑回归的回归函数是sigmoid函数，它的计算公式为：
+    <strong>$f(x) = \frac{1}{1+e^{-x}}$</strong>
+    根据sigmoid的特点，可以得到在神经网络调节参数w时的推导过程：</p>
+    <hr>
+    <p>设真实的分布为$y_{real}$,预测的分布为$y_{pred}$,则有：
+    $H(p,q) = -Σ_{i=1}^n p_i*log(q_i)$
+    $= Σ_{i=1}^n[y_{real_i}*log(y_{pred_i}) + (1-y_{real_i})*log(1-y_{pred_i})]$
+    我们要求损失函数最小，所以损失函数应当向着最小的方向梯度下降，于是我们要对损失函数求导，即：
+    $\frac{\partial H(p,q)}{\partial y_{pred_i}} = Σ_{n}-(y_{real}-y_{pred})x_i^n$</p>
+    <hr>
+    <p><strong>于是，参数调节的方式是：</strong>
+    <strong>$w_i = w_i - η*Σ_{n}-(y_{real}-y_{pred})x_i^n$</strong></p>
+    <h3>多项逻辑回归的激活函数</h3>
+    <p>多项逻辑回归的回归函数是softmax函数，它的计算公式为：
+    <strong>$f(x) = \frac{e^x}{Σ_{i=1}^n e^x}$</strong>
+    softmax回归的导数推导过程在此省略，可以参考<a href="https://blog.csdn.net/nienelong3319/article/details/114810101?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-1-114810101-blog-108435173.235%5Ev32%5Epc_relevant_default_base3&amp;spm=1001.2101.3001.4242.1&amp;utm_relevant_index=4">这篇文章</a>。</p>
+    <h3>补充：反向传播</h3>
+    <p>在神经网络构建中，利用sigmoid函数，它的反向传播过程一般是这么进行的：
+    <em><em>$W = W + η</em>(y_{real}-y_{pred})<em>y_{pred}</em>(1-y_{pred})<em>X$</em></em>
+    其中，W是参数矩阵，X是输入矩阵，y_pred是输出张量，y_real是真实张量。</p>
+    <p>我们也可以简单地记忆这个式子：
+    <em><em>$W = W + lr<em>Δ</em>Output</em>(1-Output)<em>Input$</em></em>
+    再将上述的式子一般化，对于损失函数L(q)和它的导数$\frac{\partial L(q)}{\partial q}$，我们可以得到：
+    *<em>$W = W + lr<em>Δ</em>\frac{\partial L(q)}{\partial q}<em>Input$</em></em>
+    这就是反向传播的基本过程。</p>
+    <h2>聚类问题</h2>
+    <h3>K最近邻算法 KNN</h3>
+    <p>在解决聚类问题时，传统的方法是使用K最近邻算法，即：<strong>对于一个新的样本，我们找到与它最近的K个样本，然后将它归为这K个样本中出现次数最多的那一类</strong>。
+    KNN拥有比较明显的缺点，那就是<strong>计算量大</strong>，因为我们需要计算<strong>每个</strong>样本与其他样本的距离，并且根据最相近的K个样本来判断它的类别。
+    KNN算法的伪代码如下：
+    &lt;details&gt;
+    &lt;summary&gt;KNN算法&lt;/summary&gt;</p>
+    <pre><code class="language-c++">function KNN(x)
+        for i = 1 to n
+            d[i] = distance(x, x[i])
+        sort d[1...n]
+        return majority_vote(d[1...k])
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <h3>K均值算法 K-means</h3>
+    <p>保存每个节点的坐标并进行计算要求非常大的计算量，所以诞生了K-means算法，它的思想是：将所有的点分为K组，每组的中心点作为该组的代表，然后<strong>将所有的点分配到最近的中心点所在的组中，然后重新计算每组的中心点，重复这个过程，直到中心点不再发生变化</strong>。
+    K-means算法的伪代码如下：
+    &lt;details&gt;
+    &lt;summary&gt;K-means算法&lt;/summary&gt;</p>
+    <pre><code class="language-c++">function K-means(x)
+        randomly initialize k cluster centers
+        while True
+            for i = 1 to n
+                c[i] = argmin_c distance(x[i], c)
+            for c = 1 to k
+                c = mean(x[i] where c[i] = c)
+            if no change
+                break
+        return c
+    </code></pre>
+    <p>&lt;/details&gt;</p>
+    <p>但是，<strong>聚类算法对初始化种子的选择非常敏感，同时有些种子可能会导致算法收敛的很慢</strong>，为了达到很好的效果，K-means算法一般会要求：</p>
+    <ul>
+    <li>初始化种子的选择要尽可能的分散</li>
+    <li>尝试不同的初始化种子</li>
+    </ul>
+    <h2>激活函数</h2>
+    <p>Sigmoid函数和Softmax函数的具体讨论已经在上面的内容中进行了，这里将介绍其它种类的激活函数。</p>
+    <h3>ReLU函数</h3>
+    <p>ReLU函数的计算公式为：
+    <strong>$f(x) = max(0, x)$</strong>
+    ReLU函数的优点是：</p>
+    <ul>
+    <li><strong>计算速度快，不容易出现梯度消失</strong></li>
+    </ul>
+    <p>但是它的缺点是：</p>
+    <ul>
+    <li>当神经元的输入为负数时，它的输出将永远为0，这样就会导致神经元的参数永远无法更新。</li>
+    </ul>
+    <p>由于ReLU函数的特点，所以ReLU函数经常被用于作为隐藏层的激活函数，而不是作为输出层的激活函数。</p>
+    <h3>Leaky ReLU函数</h3>
+    <p>Leaky ReLU函数的计算公式为：
+    <strong>$f(x) = max(αx, x)$</strong>
+    其中，α是一个很小的常数，在网络的训练过程中，α的值是可以被学习的。</p>
+    <h3>Tanh函数</h3>
+    <p>Tanh函数的计算公式为：
+    <strong>$f(x) = \frac{e^x-e^{-x}}{e^x+e^{-x}}$</strong>
+    Tanh函数的优点是：</p>
+    <ul>
+    <li><strong>输出值在-1到1之间，所以通常可以用来做回归任务</strong></li>
+    </ul>
+    <h2>损失函数</h2>
+    <p>损失函数可以用来量化预测的输出和真实输出的误差，可以设定优化神经网络参数的目标（是损失函数尽可能地小），并且可以用来评估模型的好坏。</p>
+    <h3>均方误差 MSE</h3>
+    <p>均方误差的计算公式为：
+    <strong>$MSE = \frac{1}{n}\sum_{i=1}^n(y_{real}-y_{pred})^2$</strong>
+    均方误差对应的是L2范数，它的特点是使得误差的平方和最小化，这样可以使得误差的值更加集中在0附近，MSE对应着嵴回归和欧拉距离。</p>
+    <h3>平均绝对误差 MAE</h3>
+    <p>平均绝对误差的计算公式为：
+    <strong>$MAE = \frac{1}{n}\sum_{i=1}^n|y_{real}-y_{pred}|$</strong>
+    平均绝对误差对应的是L1范数，它的特点是使得误差的绝对值和最小化，这样可以使得误差的值更加集中在0附近，MAE对应着L1范数和曼哈顿距离。</p>
+    <h2>优化（超多优化方法！）</h2>
+    <p>在多层感知机中，进行不断的反向传播过程中，很有可能出现梯度消失的情况，这样就会导致神经网络的参数无法更新。梯度消失问题的一个解决方法是使用ReLU函数进行激活函数。
+    当然，还有一些其他的优化方法，比如：</p>
+    <ul>
+    <li>随机梯度下降
+    每次更新不用所有的样本，而是随机选择一个batch的样本进行更新。</li>
+    <li>自适应学习率
+    在训练过程中，随着训练的进行，学习率会逐渐减小，这样可以使得模型在训练的后期更加稳定。</li>
+    <li>动量
+    动量的思想是：在更新参数的时候，不仅仅考虑当前的梯度，还要考虑之前的梯度，这样可以使得梯度的变化更加平滑。</li>
+    <li>正则化
+    正则化的思想是：在损失函数中加入一些惩罚项，使得模型的参数更加稳定，从而避免过拟合。</li>
+    <li>数据增强
+    数据增强的思想是：在训练过程中，对原始的数据进行一些变换，比如旋转、翻转、裁剪等，这样可以使得模型对于数据的变化更加鲁棒。</li>
+    <li>权重衰减
+    权重衰减的思想是：在损失函数中加入权重的L1范数，即$L_{total}=L+||W||$这样可以使得模型的参数更加稳定。</li>
+    <li>Dropout
+    Dropout的思想是：在训练过程中，随机的将一些神经元的输出置为0，这样可以使得模型的参数更加稳定。</li>
+    </ul>
+    <h1>卷积神经网络 CNN</h1>
+    <h1>生成对抗网络 GAN</h1>
+    
