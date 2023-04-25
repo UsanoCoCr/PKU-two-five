@@ -55,6 +55,12 @@ Date:2023.4.19
     - [值迭代](#值迭代)
     - [广义策略迭代 GPI](#广义策略迭代-gpi)
   - [TD学习](#td学习)
+    - [SARSA算法](#sarsa算法)
+    - [Q-learning算法](#q-learning算法)
+    - [策略梯度定理](#策略梯度定理)
+    - [蒙特卡洛策略梯度算法](#蒙特卡洛策略梯度算法)
+    - [蒙特卡洛策略梯度算法 with baseline](#蒙特卡洛策略梯度算法-with-baseline)
+    - [Actor-Critic算法](#actor-critic算法)
 - [深度学习基础](#深度学习基础)
   - [线性回归](#线性回归)
     - [Lasso回归](#lasso回归)
@@ -608,7 +614,7 @@ function expand(node)
 模拟是指从当前节点开始，不断地随机选择一个子节点，直到遇到一个终止节点，然后返回该终止节点的效用值
 有时我们可以选择随机模拟直到终局来获得效用值，也可以通过启发式函数来获得效用值
 在评估上，人们人造了一个函数来反映节点的好坏：
-**$UCB = Vi + C*sqrt(ln(n)/N_i)$**
+**$UCB = Vi + C*\sqrt{(ln(n)/N_i)}$**
 
 ### 反向传播
 反向传播是指从当前节点开始，不断地更新父节点的效用值，直到遇到根节点
@@ -700,7 +706,7 @@ G的计算公式是：
 估值大的节点，我们应该去访问；访问次数少的节点，我们应该去访问
 将当前的估值和访问次数结合起来，得到UCB值，UCB值越大，表示该节点的价值越大，越有可能是最优节点
 UCB公式是：
-**$UCB = Q_{π}(s,a) + c*sqrt(ln(N)/n)$**
+**$UCB = Q_{π}(s,a) + c*\sqrt{(ln(N)/n)}$**
 
 ## 强化学习的算法
 ### 贝尔曼方程
@@ -809,7 +815,149 @@ function value_iteration(θ)
 策略迭代和值迭代可以用来选择动作产生新策略，这起到了一种拮抗的作用，在GPI中，我们可以同时使用策略迭代和值迭代得到稳定的解决方案，同时引入协同学习的思想，使得策略迭代和值迭代的效果更好。
 
 ## TD学习
-这部分内容与深度强化学习的内容相似，在最后再补充
+TD学习和蒙特卡洛算法在实际操作层面上有一些差异：
+* TD在有或者没有结果的情况下均可以学习(如不必等一盘象棋结束)；MC则必须等待结束得到结果。TD胜！
+* TD在更新状态价值时使用的是TD 目标值，即基于即时奖励和下一状态的预估价值来替代当前状态在状态序列结束时可能得到的收获，是当前状态价值的有偏估计；而MC则使用实际的收获来更新状态价值，是某一策略下状态价值的无偏估计，MC胜！
+* 虽然TD得到的价值是有偏估计，但是其方差却比MC得到的方差要低，且对初始值敏感，通常比MC法更加高效。TD胜！
+
+TD学习的伪代码如下：
+<details>
+<summary>TD学习</summary>
+
+```c++
+function TD(θ)
+    V = 0
+    while True
+        delta = 0
+        for s in S
+            v = V[s]
+            V[s] = V[s] + α*(r + γ*V[s'] - V[s])
+            delta = max(delta, abs(v - V[s]))
+        if delta < θ
+            break
+    return V
+```
+</details>
+
+**在强化学习的应用中，有两种时序差分算法，分别是SARSA算法和Q-learning算法，它们都可以被运用到实践中。**
+
+### SARSA算法
+- SARSA算法是一种基于值的强化学习算法，它的全称是State-Action-Reward-State-Action，即状态-动作-奖励-状态-动作。
+- SARSA算法的核心思想是：在每一步更新Q值时，都**使用ε-贪心最优的动作来更新Q值**，即$Q(s,a)←Q(s,a)+α(r+γQ(s',a')-Q(s,a))$
+
+SARSA算法的伪代码如下：
+<details>
+<summary>SARSA算法</summary>
+
+```
+Initialize Q(s,a),∀s∈S,a∈A(s),Q(terminal-state,·)=0
+Repeat (for each episode):
+    Initialize s
+    Choose a from s using policy derived from Q (e.g., ε-greedy)
+    Repeat (for each step of episode):
+        Take action a, observe r, s'
+        Choose a' from s' using policy derived from Q (e.g., ε-greedy)
+        Q(s,a)←Q(s,a)+α(r+γQ(s',a')-Q(s,a))
+        s←s'; a←a';
+    until s is terminal
+```
+</details>
+SARSA通过策略给定最优的第二步来估计当前最优的第一步，如果第二步的效果很好，那么Q值就会被更新为更大的值，反之则会被更新为更小的值。
+
+### Q-learning算法
+- Q-learning算法是一种基于值的强化学习算法，它的全称是Quality-Learning，即质量学习。
+- Q-learning算法的核心思想是：在每一步更新Q值时，都**使用下一状态下的最大动作来更新Q值**，即:$Q(s,a)←Q(s,a)+α(r+γ*argmax_aQ(s',a)-Q(s,a))$
+
+Q-learning算法的伪代码如下：
+<details>
+<summary>Q-learning算法</summary>
+
+```
+Initialize Q(s,a),∀s∈S,a∈A(s),Q(terminal-state,·)=0
+Repeat (for each episode):
+    Initialize s
+    Repeat (for each step of episode):
+        Choose a from s using policy derived from Q (e.g., ε-greedy)
+        Take action a, observe r, s'
+        Q(s,a)←Q(s,a)+α(r+γ*argmax_aQ(s',a)-Q(s,a))
+        s←s'
+    until s is terminal
+```
+</details>
+
+**Q-learning通过策略给定最优（不进行贪心了！）的第二步来估计当前最优的第一步**，如果第二步的效果很好，那么Q值就会被更新为更大的值，反之则会被更新为更小的值
+
+### 策略梯度定理
+对于片段性问题，定义策略π的性能为$J(θ)=v_{πθ}(S_0)$
+在这里，θ是策略π的参数，v是状态价值函数，$S_0$是初始状态。θ的参数往往通过神经网络进行设定。
+则策略梯度定理告诉我们，策略π的梯度为：
+$∇_θJ(θ)=E_π[∑_a∇_θπ(a_t|s_t)Q_π(s_t,a_t)]$
+其中，$Q_π(s_t,a_t)$是在状态$s_t$下采取动作$a_t$的价值，$∇_θπ(a_t|s_t)$是在状态$s_t$下采取动作$a_t$的概率的梯度。
+
+### 蒙特卡洛策略梯度算法
+将策略梯度定理中的公式转化为基于采样的、期望相等的近似公式
+则状态$S_t$的价值变化率为：$\frac{G_t}{π(a_t|s_t,θ)}*∇_θπ(a_t|s_t,θ)$
+其中G是历史回报，π是策略，θ是策略的参数，$a_t$是在状态$S_t$下采取的动作。
+状态$S_t$的价值变化率乘以衰减率γ，则可以生成一个序列，得到$S_0$的价值变化率：
+$∇J(θ)=E_π[∑_tγ^t\frac{G_t}{π(a_t|s_t,θ)}*∇_θπ(a_t|s_t,θ)]$
+则可以得到蒙特卡洛策略梯度算法的伪代码：
+<details>
+<summary>蒙特卡洛策略梯度算法</summary>
+
+```
+Initialize θ
+Repeat (for each episode):
+    Generate an episode S_0,A_0,R_1,...,S_T-1,A_T-1,R_T following π(·|·,θ)
+    For each step of episode t=0,1,...,T-1:
+        G←∑_(k=t+1)^T*γ^(k-t-1)*R_k
+        θ←θ+αγ^tG∇_θlnπ(A_t|S_t,θ)
+```
+</details>
+
+### 蒙特卡洛策略梯度算法 with baseline
+在蒙特卡洛策略梯度算法中，我们可以**引入一个baseline，即$b(S_t)$，来减少方差，使得算法更加稳定**。
+在策略梯度定理中减去baseline之后，原定理变为：
+$∇_θJ(θ)=E_π[∑_a∇_θπ(a_t|s_t)(Q_π(s_t,a_t)-b(s_t))]$
+一般令$b(S_t)=v(S_t,w)$，其中**另一个神经网络W的参数为w**，v是状态价值函数，$S_t$是状态。
+则蒙特卡洛策略梯度算法 with baseline的伪代码如下：
+<details>
+<summary>蒙特卡洛策略梯度算法*</summary>
+
+```
+Initialize θ,w
+Repeat (for each episode):
+    Generate an episode S_0,A_0,R_1,...,S_T-1,A_T-1,R_T following π(·|·,θ)
+    For each step of episode t=0,1,...,T-1:
+        G←∑_(k=t+1)^T*γ^(k-t-1)*R_k
+        δ←G-v(S_t,w)
+        θ←θ+αγ^t*δ*∇_θlnπ(A_t|S_t,θ)
+        w←w+αγ^t*δ*∇_wv(S_t,w)
+```
+</details>
+
+### Actor-Critic算法
+将蒙特卡洛策略梯度算法 with baseline中的蒙特卡洛算法替换为时序差分算法，即将全部return替换为单步return，可以获得单步Actor-Critic算法。
+其中：
+* Actor是按照策略梯度算法的策略$π(A_t|S_t,θ)$决定下一步的行动
+* Critic是利用状态价值函数$v(S_t,w)$来评价策略的好坏
+
+Actor-Critic算法的伪代码如下：
+<details>
+<summary>Actor-Critic算法</summary>
+
+```
+Initialize θ,w,I=1
+Repeat (for each episode):
+    Generate an episode S_0,A_0,R_1,...,S_T-1,A_T-1,R_T following π(·|·,θ)
+    while S_t is not terminal:
+        δ←R_t+γ*v(S_t+1,w)-v(S_t,w)
+        θ←θ+α^I*δ*∇_θlnπ(A_t|S_t,θ)
+        w←w+β*δ*∇_wv(S_t,w)
+        I←γ*I
+        S_t←S_t+1
+```
+</details>
+Actor-Critic相比于蒙特卡洛平均梯度算法with baseline的改进是，w网络不仅仅用于计算baseline，还用于计算下一步的状态价值函数,分化出了一个完整的Critic网络。
 
 # 深度学习基础
 ## 线性回归
@@ -854,7 +1002,7 @@ Ridge回归的目的是为了防止过拟合，它指的是：**$λΣ_{i=1}^n(w_
 在逻辑回归中，我们使用的是交叉熵损失函数(Cross Entropy)，用于度量两个概率分布间的差异性信息，它的计算公式为：
 **$H(p,q) = -Σ_{i=1}^n p_i*log(q_i)$**
 更一般的情况下，我们可以使用KL散度(Kullback-Leibler Divergence)来计算两个概率分布之间的差异性信息，它的计算公式为：
-**$D_{KL}(p||q) = Σ_{i=1}^n p_i*log(p_i/q_i)$**
+**$D_{KL}(p||q) = Σ_{i=1}^n p_i*log(\frac{p_i}{q_i})$**
 
 则PQ的KL散度=PQ的交叉熵-P的熵
 当KL散度=0时，PQ的交叉熵=P的熵，也就是说，当两个概率分布完全一致时，KL散度为0。
