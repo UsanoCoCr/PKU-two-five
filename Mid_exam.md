@@ -95,10 +95,21 @@ Date:2023.4.19
   - [反卷积](#反卷积)
   - [卷积神经网络的应用](#卷积神经网络的应用)
     - [目标检测](#目标检测)
+      - [R-CNN](#r-cnn)
+      - [SPPNet](#sppnet)
+      - [Fast R-CNN](#fast-r-cnn)
+      - [Faster R-CNN](#faster-r-cnn)
+      - [YOLO](#yolo)
     - [图像分割](#图像分割)
+      - [SegNet](#segnet)
     - [姿态估计](#姿态估计)
+      - [CPM](#cpm)
+      - [OpenPose](#openpose)
     - [人脸识别](#人脸识别)
 - [生成对抗网络 GAN](#生成对抗网络-gan)
+  - [Vanilla GAN](#vanilla-gan)
+  - [GAN的数学原理](#gan的数学原理)
+  - [DC-GAN](#dc-gan)
 
 
 # 全局搜索
@@ -1043,15 +1054,25 @@ $\frac{\partial H(p,q)}{\partial y_{pred_i}} = Σ_{n}-(y_{real}-y_{pred})x_i^n$
 softmax回归的导数推导过程在此省略，可以参考[这篇文章](https://blog.csdn.net/nienelong3319/article/details/114810101?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-1-114810101-blog-108435173.235^v32^pc_relevant_default_base3&spm=1001.2101.3001.4242.1&utm_relevant_index=4)。
 
 ### 补充：反向传播
-在神经网络构建中，利用sigmoid函数，它的反向传播过程一般是这么进行的：
+在神经网络构建中，利用sigmoid函数和MSE均方误差，它的反向传播过程一般是这么进行的：
 **$W = W + η*(y_{real}-y_{pred})*y_{pred}*(1-y_{pred})*X$**
 其中，W是参数矩阵，X是输入矩阵，y_pred是输出张量，y_real是真实张量。
 
-我们也可以简单地记忆这个式子：
-**$W = W + lr*Δ*Output*(1-Output)*Input$**
-再将上述的式子一般化，对于损失函数L(q)和它的导数$\frac{\partial L(q)}{\partial q}$，我们可以得到：
-**$W = W + lr*Δ*\frac{\partial L(q)}{\partial q}*Input$**
+将反向传播的算法一般化，则有：
+**$W = W + η*\frac{\partial{L}}{\partial{W}}$**
+其中，L是损失函数，W是参数矩阵。
 这就是反向传播的基本过程。
+
+当然，在$Y=WX+b$，设激活函数为$A=f(Y)$，损失函数为$L(A,\hat{Y})$(而$\hat{Y}$是常数)时，我们可以使用链式法则来推导上述的式子：
+**$\frac{\partial{A}}{\partial{Y}}=f'(Y) $**
+**$\frac{\partial{L}}{\partial{A}}=L'(A)$**
+**$\frac{\partial{Y}}{\partial{W}}=X$**
+**$\frac{\partial{Y}}{\partial(b)}=1$**
+所以，
+**$\frac{\partial{L}}{\partial{Y}}=\frac{\partial{L}}{\partial{A}}*\frac{\partial{A}}{\partial{Y}}=L'(A)*f'(Y)$**
+**$\frac{\partial{L}}{\partial{W}}=\frac{\partial{L}}{\partial{Y}}*\frac{\partial{Y}}{\partial{W}}=L'(A)*f'(Y)*X$**
+**$\frac{\partial{L}}{\partial{b}}=\frac{\partial{L}}{\partial{Y}}*\frac{\partial{Y}}{\partial{b}}=L'(A)*f'(Y)*1$**
+这样，我们就知道了W和b反向传播的更新公式。
 
 ## 聚类问题
 ### K最近邻算法 KNN
@@ -1222,8 +1243,139 @@ ShuffleNet的网络结构如下图所示：
 
 ## 卷积神经网络的应用
 ### 目标检测
+在评估目标检测的效果时，引入了交并比的概念，即目标检测的图像和真实图像分为四个部分：
+* 真阳性（True Positive，TP）：检测到的目标和真实目标的交集
+* 假阳性（False Positive，FP）：检测到的目标和真实目标的差集
+* 假阴性（False Negative，FN）：未检测到的目标和真实目标的差集
+* 真阴性（True Negative，TN）：未检测到的目标和真实目标的交集
+
+而目标检测的平均精确度AP为：
+**$Precision=\frac{TP}{TP+FP}$**
+**$Recall=\frac{TP}{TP+FN}$**
+当Precision和Recall的值同时最大，即乘积最大时，目标检测的效果就越好。
+
+#### R-CNN
+R-CNN总共经过了4个步骤：
+1. 使用选择性搜索（Selective Search）算法从图像中提取出若干个候选区域
+2. 将所有的候选区域进行缩放，使得所有的候选区域的尺寸都一致
+3. 使用VGG网络对所有的候选区域进行特征提取
+4. 通过回归获取边界框的位置
+R-CNN网络还使用了非极大值抑制（Non-Maximum Suppression，NMS）算法，将重叠的边界框进行合并，保留最佳的边界框。
+下面是R-CNN的网络结构：
+![R-CNN](https://img-blog.csdnimg.cn/20190323180214918.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3BlcnNpc3RpbmxpZmU=,size_16,color_FFFFFF,t_70)
+
+**然而R-CNN具有以下四个局限性**：
+1.选择性搜索的速度慢
+2.候选区域的尺寸在算法中会变化
+3.每个区域被单独输入到VGG中，时间消耗长
+4.非端到端的训练方式
+
+#### SPPNet
+R-CNN拥有局限性**候选区域的尺寸在算法中会变化**、**每个区域被单独输入到VGG中，时间消耗长**。SPPNet通过引入空间金字塔池化（Spatial Pyramid Pooling，SPP）层解决了这两个问题。SPP层的作用是将不同尺寸的特征图池化到固定尺寸的特征图上，这样可以使得不同尺寸的特征图都可以输入到特征提取器CNN中，从而使得候选区域的尺寸不会变化，同时也可以减少计算量。
+对比SPPNet和R-CNN可以发现：
+![SPPNet](https://img.mubu.com/document_image/b7011b05-b85c-4766-a2d3-f7661a57735a-421991.jpg)
+
+#### Fast R-CNN
+Fast R-CNN提出了感兴趣区域池化层，简化了空间金字塔池化，同时使用了近似的端到端训练，**分类器、边界框回归器和特征提取器共享卷积层**，从而使得训练速度更快。而在SPP中，得到的特征图是逐个输入到分类器和边界框回归器中，这样会导致训练速度变慢。
+下面是Fast R-CNN的网络结构：
+![Fast R-CNN](https://tse1-mm.cn.bing.net/th/id/OIP-C.JyxhoyDobU9MAtT14SgAuQHaFo?pid=ImgDet&rs=1)
+
+#### Faster R-CNN
+Faster R-CNN的特点是引入了**区域生成网络（Region Proposal Network，RPN）**，RPN的作用是生成候选区域，这样就不需要使用选择性搜索算法了，从而使得训练速度更快。
+下面是Faster R-CNN的网络结构：
+![Faster R-CNN](https://tse3-mm.cn.bing.net/th/id/OIP-C.u1vuVYdMmLVmNHetJsokrAHaHX?pid=ImgDet&rs=1)
+
+#### YOLO
+在YOLO算法中，一个图像被划分成了一个7*7的网格，每个网格都会预测得到物体的置信度。
+YOLO的问题是：**算法对小物体的检测准确率过低**。
+在YOLO V2中，神经网络会给网格单元预定义多个提议区域候选并执行YOLO算法，同时将分辨率从7\*7提高到了13\*13。
+
+**总结R-CNN算法和YOLO算法，谷歌提出了新的SSD算法**，SSD算法采用了**不同的特征区域划分**（又有8\*8，又有4*4），并且通过不同的卷积层获取多个feature maps，提高了检测的准确性。
+
 ### 图像分割
+#### SegNet
+图像分割使用了全卷积神经网络FCN，仅使用卷积和池化操作，所以可以接受任意大小的输入图像。
+下面给出使用FCN解决图像分割问题的网络结构；
+![FCN](https://img1.baidu.com/it/u=3822769561,1348712415&fm=253&fmt=auto&app=138&f=JPEG?w=828&h=313)
+
+但是，当神经网络过深时，**可能会失去一些低级别的特征**，所以在实际解决问题时，**使用了跳跃连接Skip Connection的思想**，即下图的蓝色连线：
+![Skip Connection](https://pic3.zhimg.com/v2-3bb92aaa7b16b3b6002e59aa1fc014a6_r.jpg)
+
+当然，先使用R-CNN再通过神经网络来分割图像，也不是不可以，即Mask R-CNN。
+
+Tips：在图像分割时，为了避免在边界上丢失信息，我们可以使用损失加权的技巧，即：
+* 边缘加权：增加边缘的权重，使损失对边缘更加敏感
+* 平衡加权：根据小物体的大小增加权重，平衡大物体和小物体之间的权重
+
 ### 姿态估计
+姿态估计问题有两种解决思路：
+* 自顶向下：对每个人进行检测，得到边框，再使用姿态估计算法（缺点：可能无法检测到人、时间问题）
+* 自底向上：首先检测所有关键点，再分配给不同的人（缺点：难以将关键点分配给不同的人）
+
+#### CPM
+CPM算法是一种自顶向下的姿态估计算法，其核心思想是**使用多个卷积神经网络来预测关键点**，并且使用**多尺度的输入**，从而提高了算法的准确性。CPM算法的步骤是：
+1. 使用目标检测算法检测出人体的边框
+2. 将人的图像输入到VGG中，得到特征图
+3. 将特征图输入到CNN中，得到关键点的预测结果
+4. 将关键点的预测结果输入到CNN中，得到更加精确的关键点预测结果
+
+用于姿态估计的CPM网络结构如下：
+![CPM](https://img-blog.csdn.net/20180312094729995?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbXBzazA3/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+上述多阶段的方法拥有更大的感受野，同时可以精细的调整关键点的估计。
+注意：CPM算法同时可以使用残差网络ResNet来提高算法的准确性。
+
+#### OpenPose
+OpenPose算法是一种自底向上的姿态估计算法，其核心思想是**使用多个卷积神经网络来预测关键点**，并且使用**多尺度的输入**，从而提高了算法的准确性。OpenPose算法的步骤是：
+1. 将人的图像输入到VGG中，得到特征图
+2. 将特征图输入到CNN中，得到关键点的预测结果
+3. 将关键点的预测结果输入到CNN中，得到更加精确的关键点预测结果
+4. 通过CNN网络，将不同的关键点的组合分配给不同的人
+
 ### 人脸识别
+人脸识别包括closed-set和open-set两种情况：
+* closed-set：简单的分类问题，即给定一个人脸，判断这个人脸属于哪个人
+* open-set：给定一个人脸，判断这个人脸属于哪个人，如果不属于任何一个人，则判断为unknown
 
 # 生成对抗网络 GAN
+## Vanilla GAN
+Vanilla GAN的网络结构如下：
+![Vanilla GAN](https://pic4.zhimg.com/80/v2-8b2dee8b195e151c91701d8149c2e323_720w.webp)
+其中G是生成器，D是判别器，G和D都是卷积神经网络，G的输入是随机噪声，D的输入是真实图像和G生成的图像。
+
+## GAN的数学原理
+G的任务是：**生成和真实图像尽可能相似的图像**，D的任务是：**判断输入的图像是真实图像还是G生成的图像**。
+于是，我们根据上述目标，可以设计出G和D的损失函数$L_G$和$L_D$：
+* $L_G = -E[\log D(G(z))]$
+* $L_D = -E[\log D(x)] - E[\log (1 - D(G(z)))]$
+其中z是随机噪声Noise，x是真实图像Real data。
+
+那么，最优的G*和D*一定满足：
+* $G* = \arg\min_G E[\log (1 - D(G(z))]$（D(real)=1）
+* $D* = \arg\max_D E[\log D(x)] + E[\log (1 - D(G(z)))]$
+
+此时，对于函数$V(D,G)=E[\log D(x)] + E[\log (1 - D(G(z)))]$，D想要把V最大化为0，G想要把他最小化为$-\infty$，则：
+$V(D,G) = E[\log D(x)] + E[\log (1 - D(G(z)))]$
+$= \int_{x} p_{data}(x) \log D(x) dx + \int_{z} p_{z}(z) \log (1 - D(G(z))) dz$
+此时我们只观察D，将G看作常数，则：
+$V(D,G) = \int_{x} p_{data}(x) \log D(x) dx + \int_{x} p_{g}(x) \log (1 - D(x)) dx$
+将函数对D求偏导，则：
+$\frac{\partial V}{\partial D} = \int_{x} p_{data}(x) \frac{1}{D(x)}+ p_{g}(x) \frac{1}{1 - D(x)} dx$
+于是：
+$V(G,D)' = \frac{p_{data}}{D(x)} - \frac{p_{g}}{1 - D(x)} =0$
+所以可以得到D的最优解为：
+$D^* = \frac{p_{data}(x)}{p_{data}(x) + p_{g}(x)}$
+
+将D的最优解代入到V中，得到：
+$C(G)=E[\log \frac{p_{data}(x)}{p_{data}(x)+p_{g}(x)}] + E[\log \frac{p_{g}(x)}{p_{data}(x)+p_{g}(x)}]$
+此时再引入JS散度的概念，JS散度定义为：
+$JS(p||q) = \frac{1}{2}KL(p||m) + \frac{1}{2}KL(q||m)$
+**与KL散度对比，JS散度中的p和q地位是对称的，而KL散度中的p是基准，q是待比较的分布**。
+于是，我们可以得到：
+$C(G) = E[\log \frac{p_{data}(x)}{p_{g}(x)}] + E[\log \frac{p_{g}(x)}{p_{data}(x)+p_{g}(x)}] + E[\log \frac{p_{g}(x)}{p_{data}(x)}] + E[\log \frac{p_{data}(x)}{p_{data}(x)+p_{g}(x)}]$
+$= 2*JS(p_{data}||p_{g}) + 2*\log \frac{1}{2}$
+$= 2*JS(p_{data}||p_{g}) - \log 4$
+
+关于GAN网络基于Pytorch的实现，可以参考：
+* [Pytorch实现GAN]()
+
+## DC-GAN
