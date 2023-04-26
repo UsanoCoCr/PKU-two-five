@@ -110,6 +110,8 @@ Date:2023.4.19
   - [Vanilla GAN](#vanilla-gan)
   - [GAN的数学原理](#gan的数学原理)
   - [DC-GAN](#dc-gan)
+  - [VAE](#vae)
+    - [Conditional GAN](#conditional-gan)
 
 
 # 全局搜索
@@ -1376,6 +1378,19 @@ $= 2*JS(p_{data}||p_{g}) + 2*\log \frac{1}{2}$
 $= 2*JS(p_{data}||p_{g}) - \log 4$
 
 关于GAN网络基于Pytorch的实现，可以参考：
-* [Pytorch实现GAN]()
+* [Pytorch实现GAN](https://github.com/UsanoCoCr/PKU-two-five/blob/main/main_template.py)
 
 ## DC-GAN
+DC-GAN的技巧是：发挥了卷积神经网络的优势，将生成器和判别器都改成了卷积神经网络，从而提高了GAN的效果。
+DC-GAN的网络结构如下：
+![DC-GAN-G](https://img2020.cnblogs.com/blog/1813159/202008/1813159-20200815185453103-2133415157.png)
+![DC-GAN-D](https://img2020.cnblogs.com/blog/1813159/202008/1813159-20200815185516079-910008385.png)
+
+## VAE
+VAE的网络结构如下：
+![VAE](https://img1.baidu.com/it/u=74231871,1190251097&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=286)
+VAE给了我们一个新的思路：我们不仅可以将噪音转化为图像，还可以将图像转化为噪音（Encoder）
+这又导致了GAN出现了井喷似的发展。
+
+### Conditional GAN
+Conditional GAN的网络结构如下：
