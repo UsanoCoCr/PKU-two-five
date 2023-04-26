@@ -111,7 +111,8 @@ Date:2023.4.19
   - [GAN的数学原理](#gan的数学原理)
   - [DC-GAN](#dc-gan)
   - [VAE](#vae)
-    - [Conditional GAN](#conditional-gan)
+    - [多种GAN网络](#多种gan网络)
+- [笔者后记](#笔者后记)
 
 
 # 全局搜索
@@ -1392,5 +1393,20 @@ VAE的网络结构如下：
 VAE给了我们一个新的思路：我们不仅可以将噪音转化为图像，还可以将图像转化为噪音（Encoder）
 这又导致了GAN出现了井喷似的发展。
 
-### Conditional GAN
-Conditional GAN的网络结构如下：
+### 多种GAN网络
+* [Conditional GAN](https://github.com/UsanoCoCr/PKU-two-five/blob/main/conditional_gan.png)
+
+* [BiGAN](https://github.com/UsanoCoCr/PKU-two-five/blob/main/bigan.png)
+BiGAN利用了联合分布的思想，对比的是分布$p(\hat{X},Z)$和$p(X,\hat{Z})$的相似度，其中X是真实图像，Z是噪声，$\hat{X}$是G生成的图像，$\hat{Z}$是D生成的噪声。
+
+* [coGAN](https://github.com/UsanoCoCr/PKU-two-five/blob/main/cogan.png)
+* [CycleGAN](https://github.com/UsanoCoCr/PKU-two-five/blob/main/cyclegan.png)
+CycleGAN将解码器和生成器组成了一个联合结构$G_{A2B}，又将生成器和解码器组成了一个联合结构G_{B2A}$，这样就可以实现图像的互相转换。
+此时，判别器D对比的是分布$p(X_B,\hat{X_A})$和$p(\hat{X_B},X_A)$的相似度，其中X_A是真实图像A，X_B是真实图像B，$\hat{X_A}$是$G_{B2A}$生成的图像A，$\hat{X_B}$是$G_{A2B}$生成的图像B。
+
+BiGAN、CycleGAN都可以很好地解决图像->图像的问题，但是对于文本->图像的问题，就得利用Conditional GAN了。
+
+# 笔者后记
+笔者写到这里，已经是2023年4月27日的凌晨2点了。前后一周的时间，1400行代码，我完整的浏览了一遍北京大学人工智能基础课程的前两个月的知识点。确实AI基础的调参、炼丹非常nt，作业的评分方式非常nt，课程的知识点设置非常混乱，老师讲的也有一些模糊不清，不过这些知识点本身是非常有趣且有意义的。
+恰逢今天我们班的班长发了一条pyq，以感慨如果世界上没有内卷、没有恶心的评分，那些平日里拿着钩戟长铩的知识点，再看来也一定会变得平和一些。我认为这句话是非常正确的，因为知识点本身是非常有趣的，只是我们在学习的过程中，被一些不必要的东西所干扰了。和别人针锋相对、为0.01争上个头破血流，未免显得斤斤计较。大学生活应当是自由的、是快乐的，如果一个人真心认为自己的大学生活很无趣，那么无论拥有多好的成绩，从我的视角出发，我都认为他的大学生活是很失败的。
+其实AI基础这门课也是这样，学习的过程是一个人的潜心修炼，有时候当然可以在瀑布中对着幽静的山谷大喊一声“煞笔ai基础，我测你的吗”，但是最终还是要回到水流之下——水帘洞之外只能出猴子猴孙，水帘洞之内才出齐天大圣。
