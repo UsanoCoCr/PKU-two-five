@@ -799,7 +799,7 @@ function policy_iteration(θ)
         delta = 0
         for s in S
             v = V[s]
-            V[s] = Σ_aπ(a|s) Σ_{s'} Σ_r p(s',r|s,a)*(r + γ*V[s'])
+            V[s] = Σ_{s'} Σ_r p(s',r|s,π(a))*(r + γ*V[s'])
             delta = max(delta, abs(v - V[s]))
         if delta < θ
             break
