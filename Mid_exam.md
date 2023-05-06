@@ -1187,7 +1187,7 @@ $filter\_shape=filter\_height*filter\_width*in\_channels*out\_channels$
 
 ## 感受野
 感受野的概念是指：输出的某一层的神经元对于输入的某一层的神经元的影响区域。感受野的计算公式为：
-**$receptive\_field = receptive\_field\_preview + (padding-1)*\prod_{i=1}^{k-1}stride\_size$**
+**$receptive\_field = receptive\_field\_preview + (filtersize-1)*\prod_{i=1}^{k-1}stride\_size$**
 
 对于神经网络来说，感受野越大，那么它对于输入的信息的获取就越多，这样就可以使得模型的表达能力更强。所以引入了空洞卷积的概念。
 空洞卷积新增了一个卷积网络参数，即空洞率dilation，空洞卷积的取样区域是分离的，这样可以有效的增大感受野。
