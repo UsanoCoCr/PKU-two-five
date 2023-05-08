@@ -18,8 +18,36 @@
     - [静态成员](#静态成员)
   - [oop中的只读](#oop中的只读)
 - [运算符重载](#运算符重载)
+  - [浅复制与深复制](#浅复制与深复制)
+    - [友元的好处](#友元的好处)
+  - [类型转换重载](#类型转换重载)
+  - [流插入/提取运算符重载](#流插入提取运算符重载)
+  - [自增减运算符重载](#自增减运算符重载)
+  - [函数调用运算符重载](#函数调用运算符重载)
 - [继承和多态](#继承和多态)
+  - [派生类成员的可见性](#派生类成员的可见性)
+  - [派生类到基类](#派生类到基类)
+    - [派生类到基类的隐式转换](#派生类到基类的隐式转换)
+    - [基类的引用到派生类](#基类的引用到派生类)
+    - [基类的指针到派生类](#基类的指针到派生类)
+  - [运行时类型识别](#运行时类型识别)
+  - [四种类型转换](#四种类型转换)
+    - [static\_cast](#static_cast)
+    - [dynamic\_cast](#dynamic_cast)
 - [模板](#模板)
+  - [非类型模板参数](#非类型模板参数)
+  - [模板的特化与实例化](#模板的特化与实例化)
+  - [标准模板库](#标准模板库)
+    - [容器](#容器)
+      - [顺序容器](#顺序容器)
+      - [关联容器](#关联容器)
+      - [容器适配器](#容器适配器)
+    - [迭代器](#迭代器)
+    - [std::copy](#stdcopy)
+      - [std::copy\_if](#stdcopy_if)
+    - [函数对象](#函数对象)
+    - [视图](#视图)
+- [习题精选](#习题精选)
 
 > 写在前面
 > 已经很久没有写代码了，包括自己高中的时候学的一些小伎俩基本也忘干净了，现在对于计算机课来说还是很紧张的。所以打算再写一篇文档，以复刻ai基础考前抱佛脚熟读讲义之便。
@@ -251,7 +279,438 @@ public:
 ```
 
 # 运算符重载
+## 浅复制与深复制
+浅复制是指在复制对象时，只复制对象的值，而不复制对象的指针，这样会导致两个指针指向同一个对象，当其中一个指针释放对象时，另一个指针就会指向一个已经释放的对象，这就是悬空指针。
+
+深复制是指在复制对象时，不仅复制对象的值，还复制对象的指针，这样就不会出现悬空指针的情况。
+**预置的运算符重载做的是浅复制，所以可以通过深复制重载使指针指向不同的地方**
+```c++
+class String{
+    char *ptr;
+public:
+    String():ptr(new char[1]){ptr[0]='\0';}
+    String(const char *s){
+        int len=strlen(s);
+        ptr=new char[len+1];
+        strcpy(ptr,s);
+    }
+    const char *c_str(){return ptr;}
+    friend String &operator=(const char* s){
+        if(this==&s)
+            return *this;//这是为了防止String s=s
+        delete[] ptr;
+        int len=strlen(s);
+        ptr=new char[len+1];
+        strcpy(ptr,s);
+        return *this;
+    }
+    ~String(){delete[] ptr;}
+};
+```
+**注意：在上述条件下，优先进行重载的等于，而不是进行隐式转换+等于**
+
+### 友元的好处
+在重载运算符时，很多时候我们都选择使用友元重载，而不是将重载写入成员函数，这是因为对于1+c的格式，无法使用成员函数重载，而只能使用友元重载。
+```c++
+class complex{
+public:
+    int real,imag;
+    complex(int r):real(r){}
+    friend complex operator+(int n,const complex &c){
+        return complex(n+c.real);
+    }
+};
+complex c(1);
+1+c;//调用operator+(int n,const complex &c)
+```
+
+## 类型转换重载
+类型转换重载是指在c++中，我们可以重载类型转换运算符，使得我们可以自定义类型转换的过程，其语法为：
+```c++
+operator type();
+```
+即：
+```c++
+class complex{
+public:
+    int real,imag;
+    complex(int r):real(r){}
+    operator int(){return real;}
+};
+complex c(1);
+int n=c;//调用operator int()函数
+```
+
+## 流插入/提取运算符重载
+cout的本质是在iostream中定义的ostream类的对象
+所以我们可以对<<和>>进行重载
+```c++
+class complex{
+public:
+    int real,imag;
+    complex(int r):real(r){}
+    friend ostream &operator<<(ostream &out,const complex &c){
+        out<<c.real;
+        return out;
+    }
+};
+complex c(1);
+cout<<c;
+```
+
+## 自增减运算符重载
+c++为了区分i++和++i，前者被称为后置运算符，后者被称为前置运算符。
+重载后置运算符的语法为：
+```c++
+type &operator++(type2);
+type &operator--(type2);
+```
+重载前置运算符的语法为：
+```c++
+type operator++(type2,int);
+type operator--(type2,int);
+```
+其中int是一个占位符，用来区分前置和后置运算符。
+
+## 函数调用运算符重载
+函数调用运算符()也可以被重载，其语法为：
+```c++
+type operator()(type2);
+```
+例如：
+```c++
+class complex{
+public:
+    int real,imag;
+    complex(int r):real(r){}
+    int operator()(int n){
+        return real+n;
+    }
+};
+complex c(1);
+c(2);//返回3
+```
 
 # 继承和多态
+## 派生类成员的可见性
+对于公开继承的派生类，派生类可以访问基类的public成员和protected成员，但是不能访问基类的private成员。
+```c++
+class base{
+    int privatea;
+public:
+    int publica；
+};
+class derived:public base{
+public:
+    void func(){
+        publica=1;//正确
+        privatea=1;//错误
+    }
+};
+```
+对于私有继承的派生类，外部不可以通过派生类访问任何从基类继承的成员。
+```c++
+class base{
+    int privatea;
+public:
+    int publica；
+};
+class derived:private base{
+public:
+    void func(){
+        publica=1;//正确
+        privatea=1;//错误
+    }
+};
+int main(){
+    derived d;
+    d.publica=1;//错误
+}
+```
+基类的私有成员对派生类不可见有些不够灵活，所以需要一种折中的机制，即将基类的成员定义为protected
+protected的基类成员可以被以下函数访问：
+* 基类的成员函数
+* 基类的友元函数
+* 派生类的成员函数 
+* 派生类的友元函数
+
+三种类型的继承总结一下，可以得到以下表格：
+![derived](https://tse4-mm.cn.bing.net/th/id/OIP-C.ttNMpKxP6hLtw5MUUtNpZgHaDd?w=349&h=163&c=7&r=0&o=5&dpr=1.8&pid=1.7)
+
+## 派生类到基类
+首先指出：**在派生类的虚函数后加override关键字表示派生类的虚函数显式覆盖了基类的虚函数，和explicit起相同效果，显式的一定是更好的**
+**final则是禁止覆盖的关键字**
+### 派生类到基类的隐式转换
+**一个公开继承的派生类对象可以隐式转换到基类**
+* 该对象不包括派生类定义的成员
+* 从派生类构造基类时会调用基类的复制构造函数
+* 将派生类赋值到基类时会调用基类的复制赋值重载
+
+```c++
+class base{}；
+class derived:public base{};
+void func(base b);
+int main(){
+    derived d;
+    func(d);//从派生类构造基类
+    base b=d;//派生类赋值到基类
+    b=d;//基类形参，派生类实参
+    f(d);//
+}
+```
+### 基类的引用到派生类
+**若派生类公开继承自基类，则基类的引用可以绑定到派生类对象**
+**但是即使绑定到了派生类，也只能访问基类的成员，不能访问派生类的成员**
+```c++
+class base{
+public:
+    int basemem;
+};
+class derived:public base{
+public:
+    int derivedmem;
+};
+int main(){
+    derived d;
+    base &b{d};
+    b.basemem=1;//正确
+    b.derivedmem=1;//错误
+}
+``` 
+**当通过基类引用调用基类和派生类中重名的虚函数时，引用基类对象则调用基类虚函数，引用派生类对象则调用派生类虚函数**
+
+### 基类的指针到派生类
+**若派生类公开继承自基类，派生类对象的指针可以直接赋值给基类的指针**
+**即使基类指针指向的是派生类对象，也不能通过基类指针访问基类没有但是派生类有的成员**
+```c++
+class base{
+public:
+    int basemem;
+};
+class derived:public base{
+public:
+    int derivedmem;
+};
+int main(){
+    derived d;
+    base *b=&d;
+    b->basemem=1;//正确
+    b->derivedmem=1;//错误
+}
+```
+通过强制类型转换，也可以将基类的指针转换为派生类的指针：
+```c++
+derived *d=(derived*)b;
+```
+**虚函数的访问权限则是根据指针类型来判断的**
+
+## 运行时类型识别
+引入头文件
+```c++
+#include <typeinfo>
+```
+对于相同表达式的类型或相同类型，typeid运算符可以得到相同的值：
+```c++
+#include <iostream>
+#include <typeinfo>
+using namespace std;
+class base{
+public:
+    virtual ~b(){}
+};
+class d1:public b{};
+class d2:public b{};
+int main(){
+    B* b=new d1;
+    if(typeid(*b)==typeid(d1))
+        cout<<"b has type d1";
+    if(typeid(*b)==typeid(d2))
+        cout<<"b has type d2";
+    delete b;
+}
+```
+
+## 四种类型转换
+危险的const_cast和reinterpret_cast这里就不过多介绍了
+### static_cast
+静态的类型转换，基本上安全
+* 算术类型转换
+* 自定义类型转换
+* **派生类指针和基类指针间的相互转换**
+
+但是static_cast在向下转型：基类指针到派生类指针时会有风险，在长数到段数转型时也有溢出的风险
+
+### dynamic_cast
+动态类型转换，在保证多态类型向下转型绝对安全
+```c++
+Base* ptrOK=new derived{};
+Base* ptrBad=new base{};
+dynamic_cast<Derived*>(ptrOK);//正确
+dynamic_cast<Derived*>(ptrBad);//正确，但得到空指针
+```
+在if条件判断语句中可以声明变量，如果变量声明为假，即变赋值右侧转换为bool值为false，则不进行if中的语句。
+```c++
+if(auto ptrDog=dynamic_cast<const Dog*>(pAnimal))
+    ptrDog->bark();
+```
+如上式，我们可以利用这个特性做到运行时类型识别，但是它的性能要低于typeid
 
 # 模板
+## 非类型模板参数
+非类型模板参数是指模板参数不是类型，而是一个值，其语法为：
+```c++
+template<int N>
+class array{
+    int data[N];
+public:
+    int size(){return N;}
+};
+array<10> a;
+```
+在编译器角度看，array<10>和array<20>是两个不同的类
+使用非类型模板参数可以提高程序的执行效率
+
+## 模板的特化与实例化
+模板的特化是指对于某些特殊的类型，我们可以对模板进行特殊的定义，其语法为：
+```c++
+template<typename T>
+class complex{
+public:
+    T real,imag;
+    complex(T r):real(r){}
+};
+template<>
+class complex<double>{
+public:
+    double real,imag;
+    complex(double r):real(r){}
+};
+```
+在上述代码中，我们对于double类型的模板进行了特化，即对于double类型的模板，我们可以使用更加高效的实现。
+
+在类模板派生时，需要对基类实例化，即：
+```c++
+template<typename T>
+class base{};
+template<typename T>
+class derived:public base<T>{};
+```
+
+## 标准模板库
+### 容器
+#### 顺序容器
+顺序容器是指容器中的元素是按照一定的顺序排列的，包括vector、list、deque、array、forward_list
+* vector：动态数组，支持随机访问，支持尾部插入和删除，不支持中间插入和删除
+* list：双向链表，支持双向访问，支持任意位置插入和删除，**不支持随机存取**
+* deque：双端队列，支持随机访问，支持头尾插入和删除
+
+#### 关联容器
+关联容器是指容器中的元素是按照一定的规则排列的，包括set、map、multiset、multimap
+* set：集合，元素唯一，按照一定的规则排列
+* map：映射，元素唯一，按照一定的规则排列，每个元素包含一个键值对
+* multiset：集合，元素不唯一，按照一定的规则排列
+* unordered_set：集合，元素唯一，按照一定的规则排列，使用哈希表实现
+unordered_set是一种无序关联容器，插入和检索只需要常数时间，但是不支持有序性操作，如lower_bound、upper_bound等
+
+#### 容器适配器
+容器适配器是指容器的接口和实现分离，包括stack、queue、priority_queue
+
+上述容器会有一些共有的成员函数：
+* begin()：返回指向容器第一个元素的迭代器
+* end()：返回指向容器最后一个元素的下一个位置的迭代器
+* rbegin()：返回指向容器最后一个元素的迭代器
+* rend()：返回指向容器第一个元素的前一个位置的迭代器
+* erase()：删除指定位置的元素
+* clear()：删除容器中的所有元素
+* empty()：判断容器是否为空
+* size()：返回容器中元素的个数
+* swap()：交换两个容器的元素
+
+顺序容器还会有一些常用的成员函数：
+* push_back()：在容器尾部插入元素
+* pop_back()：删除容器尾部的元素
+* front()：返回容器头部的元素的引用
+* back()：返回容器尾部的元素的引用
+
+### 迭代器
+迭代器是一种类似指针的对象，可以用来遍历容器中的元素，迭代器的类型取决于容器的类型，迭代器的类型可以分为以下几种：
+* 输入迭代器：只读，只能单步向前移动（*p可以获取数据）
+* 输出迭代器：只写，只能单步向前移动（*p可以修改数据）
+* 前向迭代器：可读写，只能单步向前移动（可以p++）
+* 双向迭代器：可读写，可以双向移动（可以p--）
+* 随机访问迭代器：可读写，可以双向移动，可以随机访问（可以p+=i，比较大小，获取下标p[i]）
+* 连续迭代器：可读写，可以双向移动，可以随机访问，可以进行指针运算（数据连续存储，可以使用p-q来获得地址）
+
+### std::copy
+std::copy是一个泛型算法，可以将一个容器的元素复制到另一个容器中，其语法为：
+```c++
+copy(begin,end,begin2);
+```
+其中begin和end是第一个容器的起始位置和结束位置，begin2是第二个容器的起始位置，第二个容器的大小必须大于等于第一个容器的大小。
+
+back_inserter()是一个函数模板，可以将元素插入到容器的尾部，其语法为：
+```c++
+copy(begin,end,back_inserter(container));
+```
+#### std::copy_if
+std::copy_if比std::copy多了一个参数，最后一个参数是可调用对象，如果作用在当前参数上返回true，则将当前参数复制到第二个容器中，其语法为：
+```c++
+copy_if(begin,end,begin2,func);
+```
+
+### 函数对象
+函数对象有独立于调用的初始化过程，使用lambda表达式可以方便的定义函数对象，其语法为：
+```c++
+template<typename T>
+void someAsyncTask(T callback){
+    return;
+    int result=/*answer*/;
+    callback(result);
+}
+int main(){
+    someAsyncTask([&](int result){
+        cout<<"The answer is "<<result<<endl;
+    });
+}
+```
+
+### 视图
+视图是一种容器适配器，可以将容器的部分元素作为容器使用，其语法为：
+```c++
+#include <iostream>
+#include <vector>
+#include <algorithm>
+#include <ranges>
+int main(){
+    std::vector<int> v{1,2,3,4,5,6,7,8,9,10};
+    std::ranges::reverse_view v2{v};
+    for(auto i:v2)
+        std::cout<<i<<' ';
+}
+```
+上述reverse_view是反转视图，试图提供了一种不修改原容器的方法来访问容器的元素，这种方法可以提高程序的效率。
+
+当然，还有其他视图：
+* filter_view：筛选视图
+```c++
+std::vector<int> v{1,2,3,4,5,6,7,8,9,10};
+std::ranges::filter_view v2{v,[](int i){return i%2==0;}};
+for(auto i:v2)
+    std::cout<<i<<' ';
+```
+* transform_view：转换视图
+```c++
+std::vector<int> v{1,2,3,4,5,6,7,8,9,10};
+std::ranges::transform_view v2{v,[](int i){return i*2;}};
+for(auto i:v2)
+    std::cout<<i<<' ';
+```
+* take_view：早退视图
+```c++
+std::vector<int> v{1,2,3,4,5,6,7,8,9,10};
+std::ranges::take_view v2{v,5};
+for(auto i:v2)
+    std::cout<<i<<' ';
+```
+
+# 习题精选
